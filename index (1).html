@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[YOUR NAME] — Polymer Reaction Engineering</title>
+<meta name="description" content="Particle modelling, reaction kinetics and process optimisation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CORES — mude estas linhas para trocar o visual da página inteira
+   ============================================================ */
+:root[data-theme="dark"]{
+  --bg:#0b0f14; --panel:#121820; --panel2:#0f151c; --line:#1e2733;
+  --ink:#e8eef5; --muted:#8b98a8;
+  --accent:#4dd0e1; --accent2:#ffb454; --accent3:#e06c9f; --accent4:#8dd35f;
+  --glow:rgba(77,208,225,.16);
+}
+:root[data-theme="light"]{
+  --bg:#ffffff; --panel:#f6f8fa; --panel2:#eef2f6; --line:#e0e6ec;
+  --ink:#141a20; --muted:#5d6874;
+  --accent:#0d7d8e; --accent2:#b26a00; --accent3:#a83a6b; --accent4:#4a8a1f;
+  --glow:rgba(13,125,142,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  font-size:17px; line-height:1.62; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+.mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px;}
+@media(min-width:720px){.wrap{padding:0 32px;}}
+
+.grid-bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:46px 46px;opacity:.4;
+  mask-image:radial-gradient(ellipse 80% 55% at 50% 0%,#000 30%,transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 55% at 50% 0%,#000 30%,transparent 78%);
+}
+main,nav{position:relative;z-index:1;}
+
+/* ---------- barra de navegação ---------- */
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    background:color-mix(in srgb,var(--bg) 82%,transparent);
+    border-bottom:1px solid var(--line);}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:60px;}
+.brand{font-weight:600;letter-spacing:-.01em;font-size:.98rem;}
+.brand span{color:var(--accent);}
+.nav-links{display:none;gap:24px;align-items:center;}
+@media(min-width:820px){.nav-links{display:flex;}}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.85rem;font-weight:500;transition:color .2s;}
+.nav-links a:hover{color:var(--ink);}
+.toggle{background:none;border:1px solid var(--line);color:var(--muted);
+  width:34px;height:34px;border-radius:8px;cursor:pointer;display:grid;
+  place-items:center;transition:all .2s;font-size:15px;line-height:1;}
+.toggle:hover{color:var(--ink);border-color:var(--accent);}
+
+/* ---------- topo da página ---------- */
+.hero{padding:60px 0 24px;}
+@media(min-width:900px){.hero-in{display:grid;grid-template-columns:1fr .92fr;gap:52px;align-items:center;}}
+.eyebrow{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);
+  font-weight:500;margin-bottom:16px;}
+h1{font-size:clamp(2rem,5.5vw,3.05rem);line-height:1.08;letter-spacing:-.035em;
+  font-weight:700;margin-bottom:14px;}
+.role{font-size:1.04rem;color:var(--muted);font-weight:500;margin-bottom:20px;}
+.pitch{font-size:1.01rem;color:var(--muted);max-width:44ch;margin-bottom:28px;}
+.cta{display:flex;flex-wrap:wrap;gap:10px;}
+.btn{display:inline-block;padding:10px 18px;border-radius:9px;text-decoration:none;
+  font-size:.9rem;font-weight:500;transition:all .2s;border:1px solid var(--line);color:var(--ink);}
+.btn:hover{border-color:var(--accent);transform:translateY(-1px);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;}
+.btn.primary:hover{opacity:.88;}
+
+.particle-card{margin-top:40px;border:1px solid var(--line);border-radius:14px;
+  background:var(--panel);padding:16px;box-shadow:0 0 80px var(--glow);}
+@media(min-width:900px){.particle-card{margin-top:0;}}
+#particle{width:100%;height:330px;display:block;}
+.pcap{font-size:.74rem;color:var(--muted);text-align:center;margin-top:6px;}
+.pcap b{color:var(--accent);font-weight:500;}
+
+/* ---------- seções ---------- */
+section{padding:70px 0;}
+.sec-head{margin-bottom:30px;max-width:64ch;}
+.sec-num{font-size:.73rem;color:var(--accent);letter-spacing:.14em;margin-bottom:8px;}
+h2{font-size:clamp(1.4rem,3vw,1.85rem);letter-spacing:-.025em;font-weight:600;margin-bottom:10px;}
+.sec-head p{font-size:.97rem;color:var(--muted);}
+
+/* ---------- painel do modelo ---------- */
+.model{border:1px solid var(--line);border-radius:16px;background:var(--panel);overflow:hidden;}
+.controls{padding:20px;border-bottom:1px solid var(--line);background:var(--panel2);
+  display:grid;gap:18px;}
+@media(min-width:880px){.controls{grid-template-columns:1.35fr 1fr;gap:26px;}}
+.ctrl-group{display:grid;gap:9px;}
+.ctrl-label{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;}
+.pills{display:flex;flex-wrap:wrap;gap:7px;}
+.pill{border:1px solid var(--line);background:transparent;color:var(--muted);
+  border-radius:8px;padding:7px 12px;cursor:pointer;font-size:.8rem;
+  font-family:inherit;transition:all .18s;line-height:1.35;text-align:left;}
+.pill small{display:block;font-size:.68rem;opacity:.72;}
+.pill:hover{border-color:var(--accent);color:var(--ink);}
+.pill[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);
+  color:var(--bg);font-weight:600;}
+.pill[aria-pressed="true"] small{opacity:.85;}
+.slider-row{display:flex;align-items:center;gap:12px;}
+.fixed-note{font-size:.8rem;color:var(--accent);}
+.batch .slider-row{display:none;}
+.cstr .fixed-note{display:none;}
+.slider-row output{font-size:.8rem;color:var(--accent);min-width:74px;text-align:right;}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:3px;border-radius:3px;
+  background:var(--line);outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+  border-radius:50%;background:var(--accent);border:3px solid var(--panel2);
+  cursor:pointer;box-shadow:0 0 0 1px var(--accent);}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+  background:var(--accent);border:3px solid var(--panel2);cursor:pointer;}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  border-bottom:1px solid var(--line);}
+.stat{padding:14px 16px;border-right:1px solid var(--line);}
+.stat:last-child{border-right:none;}
+.stat .k{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.stat .v{font-size:1.02rem;font-weight:500;color:var(--accent2);margin-top:2px;}
+
+.plots{display:grid;gap:0;}
+@media(min-width:760px){.plots{grid-template-columns:repeat(3,1fr);}}
+.plot{padding:18px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);}
+.plot:last-child{border-right:none;}
+.plot h4{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;margin-bottom:10px;}
+.plot canvas{width:100%;height:190px;display:block;}
+.note{padding:14px 18px;font-size:.78rem;color:var(--muted);}
+
+/* ---------- cartões / projetos / currículo ---------- */
+.cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
+.card{border:1px solid var(--line);border-radius:12px;padding:22px;background:var(--panel);
+  transition:transform .25s,border-color .25s;}
+.card:hover{transform:translateY(-3px);border-color:var(--accent);}
+.card h3{font-size:1rem;margin-bottom:8px;font-weight:600;}
+.card p{font-size:.92rem;color:var(--muted);}
+.project{border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:0 12px 12px 0;padding:24px 26px;background:var(--panel);margin-bottom:16px;
+  transition:border-left-color .25s,transform .25s;}
+.project:hover{transform:translateX(3px);border-left-color:var(--accent2);}
+.project h3{font-size:1.05rem;margin-bottom:14px;font-weight:600;}
+.project dt{font-size:.69rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);font-weight:600;}
+.project dd{font-size:.95rem;color:var(--muted);margin-bottom:9px;}
+.project dd b{color:var(--ink);font-weight:600;}
+.cv-row{display:grid;gap:4px;padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid var(--line);}
+@media(min-width:680px){.cv-row{grid-template-columns:150px 1fr;gap:24px;}}
+.cv-when{font-size:.82rem;color:var(--accent);}
+.cv-what strong{display:block;font-weight:600;}
+.cv-what span{font-size:.92rem;color:var(--muted);}
+.contact{text-align:center;padding:76px 0;}
+.contact p{color:var(--muted);max-width:46ch;margin:0 auto 26px;}
+footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
+  color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.in{opacity:1;transform:none;}
+@media(prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none;} html{scroll-behavior:auto;}
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<nav>
+  <div class="wrap nav-in">
+    <div class="brand">[YOUR NAME]<span>.</span></div>
+    <div class="nav-links">
+      <a href="#model">Model</a>
+      <a href="#expertise">Expertise</a>
+      <a href="#projects">Projects</a>
+      <a href="#background">Background</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <button class="toggle" id="themeBtn" aria-label="Switch colour theme">☀</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ===================== TOPO DA PÁGINA ===================== -->
+  <header class="hero">
+    <div class="wrap hero-in">
+      <div>
+        <p class="eyebrow mono">Polymer Reaction Engineering · Ph.D.</p>
+        <h1>[YOUR NAME]</h1>
+        <p class="role">Particle modelling · Reaction kinetics · Process optimisation</p>
+        <p class="pitch">
+          I build models that link what happens inside a catalyst particle to what
+          comes out of the reactor — polymerisation rate, molecular weight, and the
+          operating window that gets you both.
+          <em>[Replace with two or three lines of your own.]</em>
+        </p>
+        <div class="cta">
+          <a class="btn primary" href="#model">Explore the model</a>
+          <a class="btn" href="[LINK TO YOUR CV PDF]">CV (PDF)</a>
+          <a class="btn" href="https://www.linkedin.com/in/[YOUR-LINKEDIN]/">LinkedIn</a>
+        </div>
+      </div>
+
+      <div class="particle-card">
+        <canvas id="particle" aria-label="Macroparticle built from mesoparticles"></canvas>
+        <p class="pcap mono">Macroparticle as an assembly of mesoparticles ·
+           <b id="pcapDist">Gaussian</b> distribution · colour = mesoparticle size</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== MODELO INTERATIVO ===================== -->
+  <section id="model">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="sec-num mono">01 / INTERACTIVE MODEL</p>
+        <h2>Internal particle morphology in gas-phase ethylene polymerisation</h2>
+        <p>Choose an internal morphology and watch it propagate to the polymerisation rate
+           and the molecular weight distribution, in a semibatch reactor or in a CSTR with
+           its residence time distribution.</p>
+      </div>
+
+      <div class="model reveal">
+
+        <div class="controls">
+          <div class="ctrl-group">
+            <span class="ctrl-label">Mesoparticle size distribution</span>
+            <div class="pills" id="distPills"></div>
+          </div>
+          <div style="display:grid;gap:18px">
+            <div class="ctrl-group">
+              <span class="ctrl-label">Kinetics</span>
+              <div class="pills" id="casePills"></div>
+            </div>
+            <div class="ctrl-group">
+              <span class="ctrl-label">Reactor</span>
+              <div class="pills" id="reactorPills"></div>
+            </div>
+            <div class="ctrl-group">
+              <span class="ctrl-label" id="timeLabel">Reaction time</span>
+              <div class="slider-row">
+                <input type="range" id="tSlider" min="10" max="120" step="5" value="60">
+                <output id="tOut" class="mono">60 min</output>
+              </div>
+              <p class="fixed-note mono" id="fixedNote">60 min, as in the paper</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats mono">
+          <div class="stat"><div class="k">mesoparticles</div><div class="v" id="sNp">—</div></div>
+          <div class="stat"><div class="k">M<sub>n</sub> (g/mol)</div><div class="v" id="sMn">—</div></div>
+          <div class="stat"><div class="k">M<sub>w</sub> (g/mol)</div><div class="v" id="sMw">—</div></div>
+          <div class="stat"><div class="k">Đ</div><div class="v" id="sPDI">—</div></div>
+        </div>
+
+        <div class="plots">
+          <div class="plot">
+            <h4>Mesoparticle size distribution</h4>
+            <canvas id="cDist"></canvas>
+          </div>
+          <div class="plot">
+            <h4>Polymerisation rate</h4>
+            <canvas id="cRate"></canvas>
+          </div>
+          <div class="plot">
+            <h4 id="mwdTitle">Molecular weight distribution · 60 min</h4>
+            <canvas id="cMwd"></canvas>
+          </div>
+        </div>
+
+        <p class="note">
+          Simplified implementation of the single-particle model of
+          <em>Alves Amorim et al., Ind. Eng. Chem. Res.</em> (2026): analytical solution of the
+          isothermal reaction–diffusion equation in each mesoparticle, method of moments for
+          the chain lengths, and an exponential residence time distribution for the CSTR.
+          Ethylene, 7 bar, 80 °C. The molecular weight distribution is the accumulated one:
+          after 60 min of reaction in semibatch, or at the outlet of the CSTR. The faint
+          curves are the other five distributions, drawn for comparison.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COMPETÊNCIAS ===================== -->
+  <section id="expertise">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="sec-num mono">02 / EXPERTISE</p>
+        <h2>What I do</h2>
+      </div>
+      <div class="cards">
+        <div class="card reveal">
+          <h3>Particle &amp; reactor modelling</h3>
+          <p>Multiscale models from the catalyst particle to the reactor, coupling mass
+             transfer, kinetics and thermodynamics.</p>
+        </div>
+        <div class="card reveal">
+          <h3>Parameter estimation</h3>
+          <p>Lab and pilot data turned into validated models, with the uncertainty on every
+             parameter quantified rather than assumed.</p>
+        </div>
+        <div class="card reveal">
+          <h3>Process optimisation</h3>
+          <p>Operating-window and design optimisation, including mixed-integer nonlinear
+             formulations for multi-unit systems.</p>
+        </div>
+        <div class="card reveal">
+          <h3>Tools</h3>
+          <p>MATLAB · Python · C/C++ · VBA · [simulation software]. Experimental work and
+             analytical characterisation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PROJETOS ===================== -->
+  <section id="projects">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="sec-num mono">03 / SELECTED WORK</p>
+        <h2>Projects</h2>
+      </div>
+
+      <article class="project reveal">
+        <h3>Multiparticle model of olefin polymerisation</h3>
+        <dl>
+          <dt>Problem</dt>
+          <dd>Polymer properties depend on a particle morphology that cannot be measured
+              during reaction, so its effect on rate and molecular weight could not be
+              quantified.</dd>
+          <dt>Approach</dt>
+          <dd>Built the growing particle as an assembly of mesoparticles of distributed size,
+              coupling mass transfer and kinetics, and extended it from batch to a continuous
+              reactor using Monte Carlo sampling of the residence time distribution.</dd>
+          <dt>Result</dt>
+          <dd><b>[Add the number here.]</b> Access to quantities previously out of reach for
+              predicting polymer properties and optimising reactor operation. Published in
+              <em>Ind. Eng. Chem. Res.</em> (2026).</dd>
+        </dl>
+      </article>
+
+      <article class="project reveal">
+        <h3>[Project title — name the outcome, not the technique]</h3>
+        <dl>
+          <dt>Problem</dt><dd>[What was going wrong, or what decision could not be made
+              without a model. One or two sentences, in industrial terms.]</dd>
+          <dt>Approach</dt><dd>[What you built, and from what data.]</dd>
+          <dt>Result</dt><dd><b>[The number.]</b> [What it made possible.]</dd>
+        </dl>
+      </article>
+
+      <article class="project reveal">
+        <h3>[Project title]</h3>
+        <dl>
+          <dt>Problem</dt><dd>[...]</dd>
+          <dt>Approach</dt><dd>[...]</dd>
+          <dt>Result</dt><dd><b>[...]</b> [...]</dd>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===================== FORMAÇÃO ===================== -->
+  <section id="background">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="sec-num mono">04 / BACKGROUND</p>
+        <h2>Training and positions</h2>
+      </div>
+      <div class="cv-row reveal">
+        <div class="cv-when mono">[Year] — present</div>
+        <div class="cv-what"><strong>[Current position] · [Institution or company]</strong>
+          <span>[One line on the focus of the work.]</span></div>
+      </div>
+      <div class="cv-row reveal">
+        <div class="cv-when mono">[Years]</div>
+        <div class="cv-what"><strong>Ph.D. in [field] · [University]</strong>
+          <span>[Thesis topic in one line.]</span></div>
+      </div>
+      <div class="cv-row reveal">
+        <div class="cv-when mono">[Years]</div>
+        <div class="cv-what"><strong>M.Sc. in [field] · [University]</strong>
+          <span>[One line, if useful.]</span></div>
+      </div>
+      <div class="cv-row reveal">
+        <div class="cv-when mono">Languages</div>
+        <div class="cv-what"><strong>[French (native) · English (C1) · German (B1)]</strong>
+          <span>[Certifications, if any.]</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CONTATO ===================== -->
+  <section id="contact" class="contact">
+    <div class="wrap reveal">
+      <p class="sec-num mono">05 / CONTACT</p>
+      <h2>Let's talk</h2>
+      <p>Open to R&amp;D and process engineering roles in [sector], based in [region]
+         or relocating.</p>
+      <div class="cta" style="justify-content:center">
+        <a class="btn primary" href="mailto:[YOUR EMAIL]">[YOUR EMAIL]</a>
+        <a class="btn" href="https://www.linkedin.com/in/[YOUR-LINKEDIN]/">LinkedIn</a>
+        <a class="btn" href="https://orcid.org/[YOUR-ORCID]">ORCID</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <footer>
+      <span>© 2026 [Your name]</span>
+      <span class="mono">Built with plain HTML · GitHub Pages</span>
+    </footer>
+  </div>
+
+</main>
+
+<script>
+/* ============================================================
+   1. TEMA CLARO / ESCURO
+   ============================================================ */
+const root = document.documentElement, themeBtn = document.getElementById('themeBtn');
+function setTheme(m){ root.setAttribute('data-theme', m); themeBtn.textContent = m==='dark'?'☀':'☾'; redrawAll(); }
+themeBtn.addEventListener('click', () => setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark'));
+function css(v){ return getComputedStyle(root).getPropertyValue(v).trim(); }
+
+/* ============================================================
+   2. PARÂMETROS DO MODELO  (Tabela 4 do artigo, 7 bar de C2H4, 80 °C)
+   ============================================================ */
+const P = {
+  rhoP  : 960,        // kg/m3   densidade do polímero
+  D     : 1.45e-10,   // m2/s    difusividade do etileno no LLDPE
+  Ceq   : 80.2,       // mol/m3  concentração de monômero no equilíbrio
+  mMon  : 0.028,      // kg/mol  massa molar do monômero
+  Vcat  : 1.12e-14,   // m3      volume da partícula de catalisador
+  rhoCat: 2300,       // kg/m3
+  a1    : 1,          // µm      raio da menor mesopartícula
+  an    : 10,         // µm      raio da maior mesopartícula
+  Rg    : 8.314,
+  T     : 353.15,     // K
+  Cstar : 0.97,       // mol/m3(cat)  concentração de sítios ativos
+  PH2   : 1e5,        // Pa
+  kH2   : 50,         // m3/mol/s  transferência para H2 (ajustado para Mn bater com a Tabela 6)
+  Vpol0 : 2.7e-12     // m3   volume inicial de polímero (macropartícula de 172 µm)
+};
+P.H2 = P.PH2 / (P.Rg * P.T);   // mol/m3
+P.kt = P.kH2 * P.H2;           // 1/s   frequência de transferência
+
+/* Tabela 2 — as seis distribuições de tamanho */
+const DISTS = [
+  { id:1, name:'Gaussian',     sub:'μ 6 · σ 0.9',  kind:'gauss',  mu:6, sd:0.9 },
+  { id:2, name:'Gaussian',     sub:'μ 6 · σ 5',    kind:'gauss',  mu:6, sd:5   },
+  { id:3, name:'Gaussian',     sub:'μ 8 · σ 0.9',  kind:'gauss',  mu:8, sd:0.9 },
+  { id:4, name:'Exponential',  sub:'μ 1 µm',       kind:'exp',    mu:1         },
+  { id:5, name:'Single value', sub:'r 6 µm',       kind:'single', x:6          },
+  { id:6, name:'Beta',         sub:'α 10e6 · β 1e6', kind:'beta', a:10e6, b:1e6 }
+];
+/* Tabela 5 — casos cinéticos */
+const CASES = [
+  { id:1, name:'Case 1', sub:'kp 1.1e3', kp:1.12e3 },
+  { id:2, name:'Case 2', sub:'kp 5e3',   kp:5e3    },
+  { id:3, name:'Case 3', sub:'kp 1.5e4', kp:1.5e4  }
+];
+
+/* ---- monta as classes discretas de tamanho de mesopartícula ---- */
+function buildClasses(d){
+  const NR = 91, r = [], w = [];
+  for (let i = 0; i < NR; i++) r.push(P.a1 + (P.an - P.a1) * i / (NR - 1));
+  if (d.kind === 'gauss')  r.forEach(x => w.push(Math.exp(-((x-d.mu)**2)/(2*d.sd*d.sd))));
+  if (d.kind === 'exp')    r.forEach(x => w.push(Math.exp(-x/d.mu)));
+  if (d.kind === 'single'){
+    let best = 0; r.forEach((x,i) => { if (Math.abs(x-d.x) < Math.abs(r[best]-d.x)) best = i; });
+    r.forEach((_,i) => w.push(i === best ? 1 : 0));
+  }
+  if (d.kind === 'beta'){                     // α e β enormes → aproximação normal
+    const s = d.a + d.b;
+    const mu = P.a1 + (P.an - P.a1) * d.a / s;
+    const sd = Math.max((P.an - P.a1) * Math.sqrt(d.a*d.b/(s*s*(s+1))), 0.06);
+    r.forEach(x => w.push(Math.exp(-((x-mu)**2)/(2*sd*sd))));
+  }
+  const sw = w.reduce((a,b) => a+b, 0);
+  const n  = w.map(v => v/sw);                                  // frações numéricas
+  const r3 = n.reduce((a,v,i) => a + v*r[i]**3, 0);             // <r³>
+  const vf = n.map((v,i) => v*r[i]**3/r3);                      // frações volumétricas
+  const np = P.Vpol0 / ((4/3)*Math.PI*1e-18*r3);                // total de mesopartículas
+  return { r, n, vf, np, rMean: n.reduce((a,v,i) => a+v*r[i], 0) };
+}
+
+/* ---- fator de eficiência da esfera, reação de primeira ordem ---- */
+const eta = phi => 3/phi * (1/Math.tanh(phi) - 1/phi);
+
+/* ============================================================
+   3. SIMULAÇÃO
+   ============================================================ */
+function simulate(distId, caseId, reactor, tMin){
+  const d  = DISTS.find(x => x.id === distId);
+  const kp = CASES.find(x => x.id === caseId).kp;
+  const cl = buildClasses(d);
+
+  const tauS  = tMin * 60;
+  const tEnd  = reactor === 'cstr' ? 5*tauS : tauS;   // integra até 5τ por causa da DTR
+  const STEPS = 40, dt = tEnd/STEPS, KR = 11;
+
+  /* malha de comprimento de cadeia, para a MMD */
+  const NJ = 84, nGrid = [], wGrid = new Float64Array(NJ);
+  for (let j = 0; j < NJ; j++) nGrid.push(Math.pow(10, 0.6 + 6.4*j/(NJ-1)));
+
+  /* Cada porção de polímero formada segue uma distribuição de Flory cujo único
+     parâmetro é a probabilidade local de transferência. Agrupar essas probabilidades
+     em faixas, em vez de avaliar o núcleo uma vez para cada uma, é o que mantém o
+     cálculo rápido o bastante para redesenhar enquanto se arrasta o controle. */
+  const PB = 90, pBins = new Float64Array(PB);
+  const binOf = p => Math.max(0, Math.min(PB-1,
+      Math.round(Math.log10(1/(1-p))/7*(PB-1))));
+
+  /* Cada classe de tamanho é acompanhada separadamente: os sítios que ela carrega
+     são fixos, então a concentração de sítios cai conforme ela cresce. As mesopartículas
+     maiores sofrem mais limitação de transferência de massa e por isso crescem mais
+     devagar — uma das conclusões do artigo. */
+  const Cv0 = P.Cstar * P.Vcat / P.Vpol0;        // sítios por m³ de polímero em t = 0
+  const keep = [], Vi = [], Vi0 = [], Ni = [];
+  cl.vf.forEach((v,i) => {
+    if (v <= 5e-4) return;
+    const V0 = (4/3)*Math.PI*(cl.r[i]*1e-6)**3;
+    keep.push(i); Vi.push(V0); Vi0.push(V0); Ni.push(cl.np*cl.n[i]);
+  });
+
+  let sumN = 0, sumN2 = 0, sumCh = 0, phi0 = 0;
+  const times = [], rates = [], rGrow = [];
+
+  for (let s = 0; s <= STEPS; s++){
+    const t = s*dt;
+    let rateMol = 0;
+    const contrib = [];
+
+    for (let q = 0; q < keep.length; q++){
+      const Cvi = Cv0*Vi0[q]/Vi[q];                          // sítios diluídos pelo crescimento
+      const R   = Math.cbrt(Vi[q]*3/(4*Math.PI));            // raio atual, m
+      const phi = R*Math.sqrt(kp*Cvi/P.D);
+      const sh  = Math.sinh(phi);
+      const ri  = kp*Cvi*P.Ceq*eta(phi)*Vi[q];               // mol/s, uma mesopartícula
+      const wi  = Ni[q]*ri;                                  // mol/s, esta classe
+      rateMol += wi;
+      if (s === 0) phi0 += cl.vf[keep[q]]*phi;
+      rGrow[q] = ri*P.mMon/P.rhoP;                           // dV/dt
+      for (let k = 0; k < KR; k++){
+        const x = (k + 0.5)/KR;
+        const C = P.Ceq*Math.sinh(x*phi)/(x*sh);             // eq. 8 do artigo
+        contrib.push([wi*3*x*x*(C/P.Ceq)/KR/eta(phi), kp*C/(kp*C + P.kt)]);
+      }
+    }
+
+    times.push(t/60);
+    rates.push(rateMol*P.mMon/(P.Vcat*P.rhoCat));            // kg PE / kg cat / s
+
+    let wt = dt;
+    if (s === 0 || s === STEPS) wt *= 0.5;
+    if (reactor === 'cstr') wt *= Math.exp(-t/tauS);         // ponderação por E(t)
+
+    for (const [w, p] of contrib){
+      const om = wt*w;                                       // mols de monômero
+      sumCh += om*(1-p);                                     // cadeias formadas
+      sumN  += om;                                           // Σ n
+      sumN2 += om*(1+p)/(1-p);                               // Σ n²
+      pBins[binOf(p)] += om;
+    }
+    for (let q = 0; q < keep.length; q++) Vi[q] += rGrow[q]*dt;
+  }
+
+  for (let b = 0; b < PB; b++){
+    if (pBins[b] <= 0) continue;
+    const p = 1 - Math.pow(10, -b/(PB-1)*7);
+    const lp = Math.log(p), l1 = 2*Math.log(1-p);
+    for (let j = 0; j < NJ; j++){
+      const e = 2*Math.log(nGrid[j]) + l1 + (nGrid[j]-1)*lp;   // Flory, em espaço logarítmico
+      if (e > -60) wGrid[j] += pBins[b]*Math.exp(e);
+    }
+  }
+
+  const Mn = P.mMon*1000*sumN/sumCh;        // g/mol
+  const Mw = P.mMon*1000*sumN2/sumN;
+  return {
+    cl, times, rates, phi0, Mn, Mw, PDI: Mw/Mn,
+    mwd: { x: nGrid.map(n => Math.log10(n*P.mMon*1000)), y: [...wGrid] }
+  };
+}
+
+/* ============================================================
+   4. FUNÇÕES AUXILIARES DE DESENHO
+   ============================================================ */
+/* Devolve null quando o canvas ainda não tem tamanho utilizável — o que acontece se
+   a página for desenhada antes do layout, ou enquanto um painel está escondido.
+   Desenhar nele nesse momento geraria um erro. */
+function prep(cv){
+  const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  if (r.width < 24 || r.height < 24) return null;
+  cv.width = Math.round(r.width*dpr);
+  cv.height = Math.round(r.height*dpr);
+  const c = cv.getContext('2d');
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.clearRect(0, 0, r.width, r.height);
+  return { c, w: r.width, h: r.height };
+}
+function axes(c, w, h, m, xt, yt, xlab){
+  c.strokeStyle = css('--line'); c.lineWidth = 1;
+  c.fillStyle = css('--muted'); c.font = '9px "JetBrains Mono", monospace';
+  const pw = w-m.l-m.r, ph = h-m.t-m.b;
+  yt.forEach(([v,lab]) => {
+    const y = m.t + (1-v)*ph;
+    c.beginPath(); c.moveTo(m.l,y); c.lineTo(w-m.r,y); c.stroke();
+    c.textAlign='right'; c.textBaseline='middle'; c.fillText(lab, m.l-6, y);
+  });
+  c.textAlign='center'; c.textBaseline='top';
+  xt.forEach(([v,lab]) => c.fillText(lab, m.l+v*pw, h-m.b+6));
+  if (xlab) c.fillText(xlab, m.l+pw/2, h-10);
+  return { X: v => m.l+v*pw, Y: v => m.t+(1-v)*ph };
+}
+function curve(c, pts, col, wid, alpha){
+  c.beginPath();
+  pts.forEach(([x,y],i) => i ? c.lineTo(x,y) : c.moveTo(x,y));
+  c.strokeStyle = col; c.lineWidth = wid||2.1;
+  c.lineJoin='round'; c.lineCap='round';
+  if (alpha === undefined){ c.shadowColor = col; c.shadowBlur = 6; }
+  else c.globalAlpha = alpha;
+  c.stroke(); c.shadowBlur = 0; c.globalAlpha = 1;
+}
+
+/* ---- escala de cor: 0 = clara, 1 = saturada ---- */
+function ramp(u){
+  const dark = root.getAttribute('data-theme') === 'dark';
+  const a = dark ? [22,32,44] : [214,226,234];
+  const b = dark ? [77,208,225] : [13,125,142];
+  const f = Math.max(0, Math.min(1, u))**0.8;
+  return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*f)).join(',')})`;
+}
+
+/* ============================================================
+   5. DESENHO DOS GRÁFICOS
+   ============================================================ */
+let S = { dist:1, case:2, reactor:'batch', t:60 };
+let ALL = null, RES = null, PACK = null;
+
+function drawDist(){
+  const g = prep(document.getElementById('cDist')); if (!g) return;
+  const { c, w, h } = g;
+  const m = { l:30, r:8, t:8, b:26 };
+  const { r, n } = RES.cl, mx = Math.max(...n);
+  const A = axes(c, w, h, m,
+    [[0,'1'],[0.5,'5.5'],[1,'10']],
+    [[0,'0'],[0.5,''],[1,mx.toFixed(2)]], 'mesoparticle radius (µm)');
+  const bw = (A.X(1)-A.X(0))/r.length;
+  r.forEach((rv,i) => {
+    if (n[i] <= 0) return;
+    const u = (rv-P.a1)/(P.an-P.a1), y = A.Y(n[i]/mx);
+    c.fillStyle = ramp(0.25+0.75*n[i]/mx);
+    c.fillRect(A.X(u)-bw/2, y, Math.max(bw*0.9,1.4), A.Y(0)-y);
+  });
+}
+
+/* as outras distribuições ficam esmaecidas ao fundo, como nas figuras do artigo */
+function drawRate(){
+  const g = prep(document.getElementById('cRate')); if (!g) return;
+  const { c, w, h } = g;
+  const m = { l:36, r:8, t:8, b:26 };
+  const tm = RES.times[RES.times.length-1];
+  const mx = Math.max(...ALL.map(R => Math.max(...R.rates)))*1.12;
+  const A = axes(c, w, h, m,
+    [[0,'0'],[0.5,(tm/2).toFixed(0)],[1,tm.toFixed(0)]],
+    [[0,'0'],[0.5,(mx/2).toFixed(1)],[1,mx.toFixed(1)]],
+    'time (min)   ·   kg PE / kg cat / s');
+  if (S.reactor === 'cstr'){          // distribuição de tempos de residência ao fundo
+    c.beginPath();
+    for (let i = 0; i <= 60; i++){
+      const t = i/60*tm, e = Math.exp(-t/S.t);
+      i ? c.lineTo(A.X(t/tm), A.Y(e)) : c.moveTo(A.X(t/tm), A.Y(e));
+    }
+    c.strokeStyle = css('--line'); c.lineWidth = 1; c.setLineDash([3,3]);
+    c.stroke(); c.setLineDash([]);
+  }
+  ALL.forEach((R,i) => {
+    if (DISTS[i].id === S.dist) return;
+    curve(c, R.times.map((t,k) => [A.X(t/tm), A.Y(R.rates[k]/mx)]), css('--muted'), 1.1, .38);
+  });
+  curve(c, RES.times.map((t,k) => [A.X(t/tm), A.Y(RES.rates[k]/mx)]), css('--accent2'));
+}
+
+function drawMwd(){
+  const g = prep(document.getElementById('cMwd')); if (!g) return;
+  const { c, w, h } = g;
+  const m = { l:30, r:8, t:8, b:26 };
+  const A = axes(c, w, h, m,
+    [[0,'1'],[0.5,'5'],[1,'9']],
+    [[0,'0'],[0.5,''],[1,'1']], 'log₁₀ M   ·   w(log M)');
+  const mx = Math.max(...ALL.map(R => Math.max(...R.mwd.y))) || 1;
+  const f = v => Math.max(0, Math.min(1, (v-1)/8));
+  const pts = R => R.mwd.x.map((xv,i) => [A.X(f(xv)), A.Y(R.mwd.y[i]/mx)]);
+  ALL.forEach((R,i) => {
+    if (DISTS[i].id === S.dist) return;
+    curve(c, pts(R), css('--muted'), 1.1, .38);
+  });
+  const sel = pts(RES);
+  c.beginPath();
+  sel.forEach(([px,py],i) => i ? c.lineTo(px,py) : c.moveTo(px,py));
+  c.lineTo(sel[sel.length-1][0], A.Y(0)); c.lineTo(sel[0][0], A.Y(0)); c.closePath();
+  c.fillStyle = css('--glow'); c.fill();
+  curve(c, sel, css('--accent3'));
+}
+
+/* ---- desenho da macropartícula ---- */
+function buildPack(distId){
+  const d = DISTS.find(x => x.id === distId), cl = buildClasses(d);
+  const cum = []; let acc = 0;
+  cl.n.forEach(v => { acc += v; cum.push(acc); });
+  const sample = () => { const u = Math.random()*acc; let i = 0; while (cum[i] < u && i < cum.length-1) i++; return cl.r[i]; };
+  const out = [], R = 1;                       // disco de raio 1
+  const scale = 0.052/Math.max(cl.rMean, 1);   // para caber ~200 círculos
+  for (let a = 0; a < 5200 && out.length < 230; a++){
+    const rMicron = sample(), rr = rMicron*scale;
+    const ang = Math.random()*6.2832, rad = Math.sqrt(Math.random())*(R-rr);
+    const x = Math.cos(ang)*rad, y = Math.sin(ang)*rad;
+    let ok = true;
+    for (const o of out) if ((x-o.x)**2 + (y-o.y)**2 < (rr+o.r)**2) { ok = false; break; }
+    if (!ok) continue;
+    out.push({ x, y, r: rr, u: (rMicron-P.a1)/(P.an-P.a1) });   // u = tamanho relativo
+  }
+  return out;
+}
+function drawParticle(){
+  const g = prep(document.getElementById('particle')); if (!g) return;
+  const { c, w, h } = g;
+  const R = Math.max(Math.min(w, h)/2 - 8, 1), cxp = w/2, cyp = h/2;
+  c.beginPath(); c.arc(cxp, cyp, R, 0, 6.2832);
+  c.fillStyle = css('--panel2'); c.fill();
+  c.strokeStyle = css('--line'); c.lineWidth = 1; c.stroke();
+  if (!PACK) PACK = buildPack(S.dist);
+  for (const p of PACK){
+    const x = cxp + p.x*R, y = cyp + p.y*R, r = Math.max(p.r*R, 1);
+    const g = c.createRadialGradient(x - r*0.3, y - r*0.3, r*0.1, x, y, r);
+    g.addColorStop(0, ramp(0.35 + 0.65*p.u));     // pequena = clara, grande = saturada
+    g.addColorStop(1, ramp(0.15 + 0.6*p.u));
+    c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.fillStyle = g; c.fill();
+  }
+}
+
+/* ============================================================
+   6. INTERFACE E CONTROLES
+   ============================================================ */
+function pills(host, items, get, set){
+  host.innerHTML = '';
+  items.forEach(it => {
+    const b = document.createElement('button');
+    b.className = 'pill'; b.type = 'button';
+    b.innerHTML = it.name + (it.sub ? '<small class="mono">' + it.sub + '</small>' : '');
+    b.setAttribute('aria-pressed', String(get() === it.id));
+    b.addEventListener('click', () => { set(it.id); refresh(); });
+    host.appendChild(b);
+  });
+}
+function renderPills(){
+  pills(document.getElementById('distPills'), DISTS, () => S.dist, v => { S.dist = v; PACK = null; });
+  pills(document.getElementById('casePills'), CASES, () => S.case, v => { S.case = v; PACK = null; });
+  pills(document.getElementById('reactorPills'),
+    [{ id:'batch', name:'Semibatch' }, { id:'cstr', name:'CSTR' }],
+    () => S.reactor, v => { S.reactor = v; });
+}
+const tSlider = document.getElementById('tSlider');
+tSlider.addEventListener('input', () => { S.t = +tSlider.value; refresh(); });
+
+function refresh(){
+  /* o ensaio em semibatelada é fixo em 60 min, como no artigo; só o tempo de
+     residência do CSTR é ajustável */
+  const tMin = S.reactor === 'cstr' ? S.t : 60;
+  ALL = DISTS.map(d => simulate(d.id, S.case, S.reactor, tMin));
+  RES = ALL[DISTS.findIndex(d => d.id === S.dist)];
+  renderPills();
+  const cstr = S.reactor === 'cstr';
+  document.querySelector('.model').classList.toggle('cstr', cstr);
+  document.querySelector('.model').classList.toggle('batch', !cstr);
+  document.getElementById('timeLabel').textContent =
+    cstr ? 'Mean residence time τ' : 'Reaction time';
+  document.getElementById('tOut').textContent = S.t + ' min';
+  document.getElementById('mwdTitle').textContent =
+    cstr ? 'Molecular weight distribution · outlet' : 'Molecular weight distribution · 60 min';
+  document.getElementById('sNp').textContent  = Math.round(RES.cl.np).toLocaleString('en-US');
+  document.getElementById('sMn').textContent  = RES.Mn.toPrecision(3);
+  document.getElementById('sMw').textContent  = RES.Mw.toPrecision(3);
+  document.getElementById('sPDI').textContent = RES.PDI.toFixed(2);
+  document.getElementById('pcapDist').textContent =
+    DISTS.find(d => d.id === S.dist).name;
+  redrawAll();
+}
+function redrawAll(){
+  if (!RES) return;
+  drawDist(); drawRate(); drawMwd(); drawParticle();
+}
+window.addEventListener('resize', redrawAll);
+
+/* Redesenha assim que cada canvas ganha tamanho de verdade. Sem isto os gráficos
+   ficam em branco quando a página é aberta num painel de prévia cujo layout só é
+   calculado depois que o script roda. */
+if (window.ResizeObserver){
+  let pending = 0;
+  const ro = new ResizeObserver(() => {
+    cancelAnimationFrame(pending);
+    pending = requestAnimationFrame(redrawAll);
+  });
+  ['particle','cDist','cRate','cMwd'].forEach(id => ro.observe(document.getElementById(id)));
+}
+
+setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+refresh();
+
+/* ---- passeio automático pelas distribuições até alguém mexer nos controles ---- */
+let touched = false;
+document.querySelector('.model').addEventListener('pointerdown', () => { touched = true; });
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (!reduced) setInterval(() => {
+  if (touched) return;
+  const order = [1, 5, 4, 6];
+  S.dist = order[(order.indexOf(S.dist) + 1) % order.length];
+  PACK = null; refresh();
+}, 4200);
+
+/* ============================================================
+   7. APARIÇÃO DAS SEÇÕES AO ROLAR
+   ============================================================ */
+const io = new IntersectionObserver(es => {
+  es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach((el,i) => {
+  el.style.transitionDelay = (i%4)*70 + 'ms'; io.observe(el);
+});
+</script>
+
+</body>
+</html>
