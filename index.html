@@ -149,6 +149,8 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
   border-radius:0 12px 12px 0;padding:24px 26px;background:var(--panel);margin-bottom:16px;
   transition:border-left-color .25s,transform .25s;}
 .project:hover{transform:translateX(3px);border-left-color:var(--accent2);}
+.project .tag{display:block;font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent2);font-weight:600;margin-bottom:7px;}
 .project h3{font-size:1.05rem;margin-bottom:14px;font-weight:600;}
 .project dt{font-size:.69rem;letter-spacing:.12em;text-transform:uppercase;
   color:var(--accent);font-weight:600;}
@@ -356,16 +358,18 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
       </div>
 
       <article class="project reveal">
-        <h3>Predicting polyethylene dissolution to avoid reactor shutdowns</h3>
+        <span class="tag mono">Modelling &amp; simulation</span>
+        <h3>Thermodynamic modelling of polyethylene dissolution to avoid
+            reactor shutdowns</h3>
         <dl>
           <dt>Problem</dt>
           <dd>Polymer dissolving into the diluent causes gelation and fouling, and there
               was no reliable way to predict when it would happen — so operating limits
               were set conservatively, or discovered the hard way.</dd>
           <dt>Approach</dt>
-          <dd>Applied the Sanchez-Lacombe equation of state to polyethylene sorption and
-              swelling in slurry and gas phase. Part of the work was carried out at the
-              University of Alberta.</dd>
+          <dd>Built a thermodynamic model from the Sanchez-Lacombe equation of state,
+              applied to polyethylene sorption and swelling in slurry and gas phase. Part
+              of the work was carried out at the University of Alberta.</dd>
           <dt>Result</dt>
           <dd><b>First predictive model of polyethylene dissolution reported in the
               literature.</b> A tool to prevent gelation, reduce the risk of costly
@@ -374,6 +378,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
       </article>
 
       <article class="project reveal">
+        <span class="tag mono">Modelling &amp; simulation</span>
         <h3>Multiparticle model of olefin polymerisation</h3>
         <dl>
           <dt>Problem</dt>
@@ -386,16 +391,19 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
               continuous reactor using Monte Carlo sampling of the residence time
               distribution.</dd>
           <dt>Result</dt>
-          <dd><b>Access to quantities that were previously out of reach</b> for predicting
-              polymer properties and optimising reactor operation. Published in
-              <em>Ind. Eng. Chem. Res.</em> (2026) — and running live
+          <dd><b>A route from a morphology nobody can measure to the properties that
+              define the grade.</b> The model explains why two batches from the same recipe
+              come out different, and shows which operating conditions keep rate and
+              molecular weight on target. Published in <em>Ind. Eng. Chem. Res.</em> (2026)
+              — and running live
               <a href="#model" style="color:var(--accent);text-decoration:none">at the top
               of this page</a>.</dd>
         </dl>
       </article>
 
       <article class="project reveal">
-        <h3>Cost optimisation of residential renewable microgrids</h3>
+        <span class="tag mono">Optimisation &amp; decision support</span>
+        <h3>Cost optimisation of renewable microgrids</h3>
         <dl>
           <dt>Problem</dt>
           <dd>Microgrid design studies assume constant equipment efficiency, which
@@ -405,13 +413,16 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
               accounting for the real, time-varying efficiency of solar, wind and biogas
               units, with clustering used to reduce the dimensionality of the problem.</dd>
           <dt>Result</dt>
-          <dd><b>45 % reduction in total system cost.</b> Published in
-              <em>Chemical Engineering Research and Design</em> (2025).</dd>
+          <dd><b>45 % reduction in total system cost</b>, with demand met in full. The
+              same framework transfers to utility sizing and energy integration on an
+              industrial site, where equipment also runs far from nameplate efficiency.
+              Published in <em>Chemical Engineering Research and Design</em> (2025).</dd>
         </dl>
       </article>
 
       <article class="project reveal">
-        <h3>Lean Six Sigma in a public pension service</h3>
+        <span class="tag mono">Continuous improvement</span>
+        <h3>Lean Six Sigma on a high-volume service process</h3>
         <dl>
           <dt>Problem</dt>
           <dd>Users of a municipal pension fund faced long and unpredictable waiting times,
@@ -421,12 +432,14 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
               eliminated waste, rebalanced flows and standardised tasks. Process modelling
               and automation in BPM and VBA.</dd>
           <dt>Result</dt>
-          <dd><b>71 % reduction in average waiting time</b>, brought under 15 minutes, and
-              a lasting improvement in service level.</dd>
+          <dd><b>71 % reduction in average lead time</b>, brought under 15 minutes, and a
+              lasting improvement in service level. The DMAIC cycle behind it is the same
+              one used on a production line to attack changeover time or scrap.</dd>
         </dl>
       </article>
 
       <article class="project reveal">
+        <span class="tag mono">Management &amp; automation</span>
         <h3>Automation of a manual task in the paint industry</h3>
         <dl>
           <dt>Problem</dt>
@@ -435,7 +448,8 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
           <dt>Approach</dt>
           <dd>Designed and deployed an automated system in VBA.</dd>
           <dt>Result</dt>
-          <dd><b>Around 99.5 % less working time</b> spent on the task.</dd>
+          <dd><b>Around 99.5 % less working time</b> spent on the task, and transcription
+              errors removed from the chain.</dd>
         </dl>
       </article>
     </div>
