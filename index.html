@@ -158,7 +158,11 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
 @media(min-width:680px){.cv-row{grid-template-columns:150px 1fr;gap:24px;}}
 .cv-when{font-size:.82rem;color:var(--accent);}
 .cv-what strong{display:block;font-weight:600;}
-.cv-what span{font-size:.92rem;color:var(--muted);}
+.cv-what span{display:block;font-size:.92rem;color:var(--muted);}
+.cv-list{margin:6px 0 0;padding-left:17px;}
+.cv-list li{font-size:.9rem;color:var(--muted);margin-bottom:3px;}
+.cv-what a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;}
+.cv-what a:hover{border-bottom-color:var(--accent);}
 .contact{text-align:center;padding:76px 0;}
 .contact p{color:var(--muted);max-width:46ch;margin:0 auto 26px;}
 footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
@@ -371,36 +375,68 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
     </div>
   </section>
 
-  <!-- ===================== FORMAÇÃO ===================== -->
+     <!-- ===================== FORMATION ===================== -->
   <section id="background">
     <div class="wrap">
       <div class="sec-head reveal">
         <p class="sec-num mono">04 / BACKGROUND</p>
         <h2>Training and positions</h2>
       </div>
+
       <div class="cv-row reveal">
         <div class="cv-when mono">03/2026 — present</div>
-        <div class="cv-what"><strong>Postdoctoral Researcher · Laboratory of Automation, Process and Pharmaceutical Engineering  (LAGEPP), Villeurbanne, France </strong>
-          <span>[One line on the focus of the work.]</span></div>
+        <div class="cv-what">
+          <strong>Postdoctoral Researcher · LAGEPP, Villeurbanne, France</strong>
+          <span>Laboratory of Automation, Process and Pharmaceutical Engineering.
+                [One line on the focus of the work.]</span>
+        </div>
       </div>
+
       <div class="cv-row reveal">
         <div class="cv-when mono">[Years]</div>
-        <div class="cv-what"><strong>Ph.D. in Process Engineering · Université Claude Bernard Lyon 1, Villeurbanne, France</strong>
-         <span>Doctoral exchange — University of Alberta, Edmonton, Canada (06/2024 – 12/2024).</span></div>
-         <span> Systematic comparison of slurry and gas phase process – physical aspects, thermodynamics and distribution of alkyl alumina. </span></div>
-         <span> PhD thesis: https://theses.hal.science/tel-05575287/ </span></div>
+        <div class="cv-what">
+          <strong>Ph.D. in Process Engineering · Université Claude Bernard Lyon 1,
+                  Villeurbanne, France</strong>
+          <span>Systematic comparison of slurry and gas phase processes: physical aspects,
+                thermodynamics and distribution of alkyl aluminium.</span>
+          <ul class="cv-list">
+            <li>Doctoral exchange — University of Alberta, Edmonton, Canada
+                (06/2024 – 12/2024)</li>
+            <li><a href="https://theses.hal.science/tel-05575287/" target="_blank"
+                   rel="noopener">Read the thesis</a></li>
+          </ul>
+        </div>
       </div>
+
       <div class="cv-row reveal">
-        <div class="cv-when mono">[09/2020 – 04/2023]</div>
-        <div class="cv-what"><strong>M.Sc. in Industrial Engineering  · Universidade Federal da Bahia, Salvador, Brazil </strong>
-         <span> Master's exchange — Brandenburg University of Technology Cottbus-Senftenberg, Germany (02/2022 – 08/2022). </span></div>
-         <span>Optimizing microgrid design and operation in Brazil: a decision-making framework for residential distributed energy systems </span></div>
-         <a class="btn" href=" https://repositorio.ufba.br/handle/ri/37475">Master thesis</a>
+        <div class="cv-when mono">09/2020 — 04/2023</div>
+        <div class="cv-what">
+          <strong>M.Sc. in Industrial Engineering · Universidade Federal da Bahia,
+                  Salvador, Brazil</strong>
+          <span>Optimising microgrid design and operation in Brazil: a decision-making
+                framework for residential distributed energy systems.</span>
+          <ul class="cv-list">
+            <li>Master's exchange — Brandenburg University of Technology
+                Cottbus-Senftenberg, Germany (02/2022 – 08/2022)</li>
+            <li><a href="https://repositorio.ufba.br/handle/ri/37475" target="_blank"
+                   rel="noopener">Read the dissertation</a></li>
+          </ul>
+        </div>
       </div>
+
       <div class="cv-row reveal">
         <div class="cv-when mono">Languages</div>
-        <div class="cv-what"><strong> Portuguese (native) · English (advanced) · French (intermediate) ·  German (elementary)</strong>
-          <span>Green Belt in Lean Six Sigma</span></div>
+        <div class="cv-what">
+          <strong>Portuguese (native) · English (advanced) · French (intermediate) ·
+                  German (elementary)</strong>
+        </div>
+      </div>
+
+      <div class="cv-row reveal">
+        <div class="cv-when mono">Certification</div>
+        <div class="cv-what">
+          <strong>Green Belt in Lean Six Sigma</strong>
+        </div>
       </div>
     </div>
   </section>
