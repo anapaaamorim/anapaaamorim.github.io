@@ -110,9 +110,6 @@ h2{font-size:clamp(1.4rem,3vw,1.85rem);letter-spacing:-.025em;font-weight:600;ma
   color:var(--bg);font-weight:600;}
 .pill[aria-pressed="true"] small{opacity:.85;}
 .slider-row{display:flex;align-items:center;gap:12px;}
-.fixed-note{font-size:.8rem;color:var(--accent);}
-.batch .slider-row{display:none;}
-.cstr .fixed-note{display:none;}
 .slider-row output{font-size:.8rem;color:var(--accent);min-width:74px;text-align:right;}
 input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:3px;border-radius:3px;
   background:var(--line);outline:none;cursor:pointer;}
@@ -256,10 +253,9 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
             <div class="ctrl-group">
               <span class="ctrl-label" id="timeLabel">Reaction time</span>
               <div class="slider-row">
-                <input type="range" id="tSlider" min="10" max="120" step="5" value="60">
+                <input type="range" id="tSlider" min="5" max="60" step="5" value="60">
                 <output id="tOut" class="mono">60 min</output>
               </div>
-              <p class="fixed-note mono" id="fixedNote">60 min, as in the paper</p>
             </div>
           </div>
         </div>
@@ -291,9 +287,13 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
           <em>Alves Amorim et al., Ind. Eng. Chem. Res.</em> (2026): analytical solution of the
           isothermal reaction–diffusion equation in each mesoparticle, method of moments for
           the chain lengths, and an exponential residence time distribution for the CSTR.
-          Ethylene, 7 bar, 80 °C. The molecular weight distribution is the accumulated one:
-          after 60 min of reaction in semibatch, or at the outlet of the CSTR. The faint
-          curves are the other five distributions, drawn for comparison.
+          Ethylene, 7 bar, 80 °C. In semibatch the particle starts as a 172 µm
+          prepolymer and all six distributions are available. The CSTR is reactor 1 of the
+          two-reactor cascade of Section 3.2: the prepolymer enters at 20 µm, the paper
+          compares only the exponential and beta distributions there, and the curve is the
+          profile of a single particle against its residence time — what leaves the reactor
+          is the residence-time-weighted average, marked by the dashed line. The faint
+          curves are the other distributions, drawn for comparison.
         </p>
       </div>
     </div>
@@ -673,7 +673,11 @@ const P = {
   Cstar : 0.97,       // mol/m3(cat)  concentração de sítios ativos
   PH2   : 1e5,        // Pa
   kH2   : 50,         // m3/mol/s  transferência para H2 (ajustado para Mn bater com a Tabela 6)
-  Vpol0 : 2.7e-12     // m3   volume inicial de polímero (macropartícula de 172 µm)
+  Vpol0 : 2.7e-12,    // m3   semibatelada: macropartícula de 172 µm
+  /* Reator 1 da cascata: o prepolímero entra com 10–30 µm, média 20 µm (seção 3.2 do
+     artigo). A partícula é muito menor, então a concentração de sítios por m³ de
+     polímero é muito maior e a limitação difusional é bem mais severa. */
+  VpolCSTR : (4/3)*Math.PI*Math.pow(10e-6, 3)
 };
 P.H2 = P.PH2 / (P.Rg * P.T);   // mol/m3
 P.kt = P.kH2 * P.H2;           // 1/s   frequência de transferência
@@ -695,7 +699,7 @@ const CASES = [
 ];
 
 /* ---- monta as classes discretas de tamanho de mesopartícula ---- */
-function buildClasses(d){
+function buildClasses(d, Vpol0){
   const NR = 91, r = [], w = [];
   for (let i = 0; i < NR; i++) r.push(P.a1 + (P.an - P.a1) * i / (NR - 1));
   if (d.kind === 'gauss')  r.forEach(x => w.push(Math.exp(-((x-d.mu)**2)/(2*d.sd*d.sd))));
@@ -714,7 +718,7 @@ function buildClasses(d){
   const n  = w.map(v => v/sw);                                  // frações numéricas
   const r3 = n.reduce((a,v,i) => a + v*r[i]**3, 0);             // <r³>
   const vf = n.map((v,i) => v*r[i]**3/r3);                      // frações volumétricas
-  const np = P.Vpol0 / ((4/3)*Math.PI*1e-18*r3);                // total de mesopartículas
+  const np = Vpol0 / ((4/3)*Math.PI*1e-18*r3);                   // total de mesopartículas
   return { r, n, vf, np, rMean: n.reduce((a,v,i) => a+v*r[i], 0) };
 }
 
@@ -727,10 +731,12 @@ const eta = phi => 3/phi * (1/Math.tanh(phi) - 1/phi);
 function simulate(distId, caseId, reactor, tMin){
   const d  = DISTS.find(x => x.id === distId);
   const kp = CASES.find(x => x.id === caseId).kp;
-  const cl = buildClasses(d);
+  const cstr = reactor === 'cstr';
+  const Vpol0 = cstr ? P.VpolCSTR : P.Vpol0;
+  const cl = buildClasses(d, Vpol0);
 
   const tauS  = tMin * 60;
-  const tEnd  = reactor === 'cstr' ? 5*tauS : tauS;   // integra até 5τ por causa da DTR
+  const tEnd  = cstr ? 5*tauS : tauS;                 // integra até 5τ por causa da DTR
   const STEPS = 40, dt = tEnd/STEPS, KR = 11;
 
   /* malha de comprimento de cadeia, para a MMD */
@@ -749,7 +755,7 @@ function simulate(distId, caseId, reactor, tMin){
      são fixos, então a concentração de sítios cai conforme ela cresce. As mesopartículas
      maiores sofrem mais limitação de transferência de massa e por isso crescem mais
      devagar — uma das conclusões do artigo. */
-  const Cv0 = P.Cstar * P.Vcat / P.Vpol0;        // sítios por m³ de polímero em t = 0
+  const Cv0 = P.Cstar * P.Vcat / Vpol0;          // sítios por m³ de polímero em t = 0
   const keep = [], Vi = [], Vi0 = [], Ni = [];
   cl.vf.forEach((v,i) => {
     if (v <= 5e-4) return;
@@ -757,7 +763,7 @@ function simulate(distId, caseId, reactor, tMin){
     keep.push(i); Vi.push(V0); Vi0.push(V0); Ni.push(cl.np*cl.n[i]);
   });
 
-  let sumN = 0, sumN2 = 0, sumCh = 0, phi0 = 0;
+  let sumN = 0, sumN2 = 0, sumCh = 0, avgNum = 0, avgDen = 0;
   const times = [], rates = [], rGrow = [];
 
   for (let s = 0; s <= STEPS; s++){
@@ -773,7 +779,6 @@ function simulate(distId, caseId, reactor, tMin){
       const ri  = kp*Cvi*P.Ceq*eta(phi)*Vi[q];               // mol/s, uma mesopartícula
       const wi  = Ni[q]*ri;                                  // mol/s, esta classe
       rateMol += wi;
-      if (s === 0) phi0 += cl.vf[keep[q]]*phi;
       rGrow[q] = ri*P.mMon/P.rhoP;                           // dV/dt
       for (let k = 0; k < KR; k++){
         const x = (k + 0.5)/KR;
@@ -787,7 +792,12 @@ function simulate(distId, caseId, reactor, tMin){
 
     let wt = dt;
     if (s === 0 || s === STEPS) wt *= 0.5;
-    if (reactor === 'cstr') wt *= Math.exp(-t/tauS);         // ponderação por E(t)
+    if (cstr){
+      const E = Math.exp(-t/tauS)/tauS;                      // E(t) da DTR exponencial
+      wt *= Math.exp(-t/tauS);
+      avgNum += E*rates[rates.length-1]*dt;                  // média de estado estacionário
+      avgDen += E*dt;
+    }
 
     for (const [w, p] of contrib){
       const om = wt*w;                                       // mols de monômero
@@ -812,7 +822,8 @@ function simulate(distId, caseId, reactor, tMin){
   const Mn = P.mMon*1000*sumN/sumCh;        // g/mol
   const Mw = P.mMon*1000*sumN2/sumN;
   return {
-    cl, times, rates, phi0, Mn, Mw, PDI: Mw/Mn,
+    cl, times, rates, Mn, Mw, PDI: Mw/Mn,
+    avgRate: avgDen > 0 ? avgNum/avgDen : null,
     mwd: { x: nGrid.map(n => Math.log10(n*P.mMon*1000)), y: [...wGrid] }
   };
 }
@@ -870,7 +881,11 @@ function ramp(u){
    5. DESENHO DOS GRÁFICOS
    ============================================================ */
 let S = { dist:1, case:2, reactor:'batch', t:60 };
-let ALL = null, RES = null, PACK = null;
+let ALL = null, RES = null, PACK = null, ACTIVE = [];
+
+/* No reator contínuo o artigo compara só as distribuições 4 (exponencial) e 6 (beta),
+   que são os extremos de tamanho de mesopartícula (Figura 13). */
+const cstrDists = () => DISTS.filter(d => d.id === 4 || d.id === 6);
 
 function drawDist(){
   const g = prep(document.getElementById('cDist')); if (!g) return;
@@ -900,20 +915,22 @@ function drawRate(){
     [[0,'0'],[0.5,(tm/2).toFixed(0)],[1,tm.toFixed(0)]],
     [[0,'0'],[0.5,(mx/2).toFixed(1)],[1,mx.toFixed(1)]],
     'time (min)   ·   kg PE / kg cat / s');
-  if (S.reactor === 'cstr'){          // distribuição de tempos de residência ao fundo
-    c.beginPath();
-    for (let i = 0; i <= 60; i++){
-      const t = i/60*tm, e = Math.exp(-t/S.t);
-      i ? c.lineTo(A.X(t/tm), A.Y(e)) : c.moveTo(A.X(t/tm), A.Y(e));
-    }
-    c.strokeStyle = css('--line'); c.lineWidth = 1; c.setLineDash([3,3]);
-    c.stroke(); c.setLineDash([]);
-  }
   ALL.forEach((R,i) => {
-    if (DISTS[i].id === S.dist) return;
+    if (ACTIVE[i].id === S.dist) return;
     curve(c, R.times.map((t,k) => [A.X(t/tm), A.Y(R.rates[k]/mx)]), css('--muted'), 1.1, .38);
   });
   curve(c, RES.times.map((t,k) => [A.X(t/tm), A.Y(RES.rates[k]/mx)]), css('--accent2'));
+  /* No CSTR a curva é o perfil de uma partícula em função do seu tempo de residência;
+     o que sai do reator é a média ponderada pela DTR, marcada pela linha tracejada. */
+  if (S.reactor === 'cstr' && RES.avgRate != null){
+    const y = A.Y(RES.avgRate/mx);
+    c.beginPath(); c.moveTo(A.X(0), y); c.lineTo(A.X(1), y);
+    c.strokeStyle = css('--accent'); c.lineWidth = 1.2; c.setLineDash([4,4]);
+    c.stroke(); c.setLineDash([]);
+    c.fillStyle = css('--accent'); c.font = '9px "JetBrains Mono", monospace';
+    c.textAlign = 'right'; c.textBaseline = 'bottom';
+    c.fillText('reactor average', A.X(1) - 2, y - 3);
+  }
 }
 
 function drawMwd(){
@@ -927,7 +944,7 @@ function drawMwd(){
   const f = v => Math.max(0, Math.min(1, (v-1)/8));
   const pts = R => R.mwd.x.map((xv,i) => [A.X(f(xv)), A.Y(R.mwd.y[i]/mx)]);
   ALL.forEach((R,i) => {
-    if (DISTS[i].id === S.dist) return;
+    if (ACTIVE[i].id === S.dist) return;
     curve(c, pts(R), css('--muted'), 1.1, .38);
   });
   const sel = pts(RES);
@@ -940,7 +957,8 @@ function drawMwd(){
 
 /* ---- desenho da macropartícula ---- */
 function buildPack(distId){
-  const d = DISTS.find(x => x.id === distId), cl = buildClasses(d);
+  const d = DISTS.find(x => x.id === distId);
+  const cl = buildClasses(d, S.reactor === 'cstr' ? P.VpolCSTR : P.Vpol0);
   const cum = []; let acc = 0;
   cl.n.forEach(v => { acc += v; cum.push(acc); });
   const sample = () => { const u = Math.random()*acc; let i = 0; while (cum[i] < u && i < cum.length-1) i++; return cl.r[i]; };
@@ -989,11 +1007,16 @@ function pills(host, items, get, set){
   });
 }
 function renderPills(){
-  pills(document.getElementById('distPills'), DISTS, () => S.dist, v => { S.dist = v; PACK = null; });
+  pills(document.getElementById('distPills'), ACTIVE, () => S.dist, v => { S.dist = v; PACK = null; });
   pills(document.getElementById('casePills'), CASES, () => S.case, v => { S.case = v; PACK = null; });
   pills(document.getElementById('reactorPills'),
-    [{ id:'batch', name:'Semibatch' }, { id:'cstr', name:'CSTR' }],
-    () => S.reactor, v => { S.reactor = v; });
+    [{ id:'batch', name:'Semibatch' }, { id:'cstr', name:'CSTR · reactor 1' }],
+    () => S.reactor, v => {
+      S.reactor = v; PACK = null;
+      S.t = v === 'cstr' ? 30 : 60;                 // 30 min por reator, como no artigo
+      if (v === 'cstr' && S.dist !== 4 && S.dist !== 6) S.dist = 4;
+      if (v === 'batch') S.case = S.case;
+    });
 }
 const tSlider = document.getElementById('tSlider');
 tSlider.addEventListener('input', () => { S.t = +tSlider.value; refresh(); });
@@ -1001,18 +1024,22 @@ tSlider.addEventListener('input', () => { S.t = +tSlider.value; refresh(); });
 function refresh(){
   /* o ensaio em semibatelada é fixo em 60 min, como no artigo; só o tempo de
      residência do CSTR é ajustável */
-  const tMin = S.reactor === 'cstr' ? S.t : 60;
-  ALL = DISTS.map(d => simulate(d.id, S.case, S.reactor, tMin));
-  RES = ALL[DISTS.findIndex(d => d.id === S.dist)];
-  renderPills();
   const cstr = S.reactor === 'cstr';
+  ACTIVE = cstr ? cstrDists() : DISTS;
+  if (!ACTIVE.some(d => d.id === S.dist)) S.dist = ACTIVE[0].id;
+  ALL = ACTIVE.map(d => simulate(d.id, S.case, S.reactor, S.t));
+  RES = ALL[ACTIVE.findIndex(d => d.id === S.dist)];
+  renderPills();
+  tSlider.min = cstr ? 10 : 5;
+  tSlider.value = S.t;
   document.querySelector('.model').classList.toggle('cstr', cstr);
   document.querySelector('.model').classList.toggle('batch', !cstr);
   document.getElementById('timeLabel').textContent =
     cstr ? 'Mean residence time τ' : 'Reaction time';
   document.getElementById('tOut').textContent = S.t + ' min';
-  document.getElementById('mwdTitle').textContent =
-    cstr ? 'Molecular weight distribution · outlet' : 'Molecular weight distribution · 60 min';
+  document.getElementById('mwdTitle').textContent = cstr
+    ? 'Molecular weight distribution · reactor 1 outlet'
+    : 'Molecular weight distribution · ' + S.t + ' min';
   document.getElementById('sNp').textContent  = Math.round(RES.cl.np).toLocaleString('en-US');
   document.getElementById('sMn').textContent  = RES.Mn.toPrecision(3);
   document.getElementById('sMw').textContent  = RES.Mw.toPrecision(3);
@@ -1048,7 +1075,7 @@ document.querySelector('.model').addEventListener('pointerdown', () => { touched
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (!reduced) setInterval(() => {
   if (touched) return;
-  const order = [1, 5, 4, 6];
+  const order = S.reactor === 'cstr' ? [4, 6] : [1, 5, 4, 6];
   S.dist = order[(order.indexOf(S.dist) + 1) % order.length];
   PACK = null; refresh();
 }, 4200);
