@@ -260,11 +260,12 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
         <h1>Dr. Ana Paula Alves Amorim</h1>
         <p class="role">Particle modelling · Reaction kinetics · Process optimisation</p>
         <p class="pitch">
-          I build models that link what happens inside a catalyst particle to what comes
-          out of the reactor — polymerisation rate, molecular weight, and the operating
-          window that gets you both. Trained in France, Canada, Germany and Brazil, I work
-          where modelling meets the plant: predicting failure modes before they cost a
-          shutdown, and turning experimental data into decisions.
+         I develop models that connect fundamental chemistry and transport phenomena to real-world process performance. 
+         My work spans process modeling, simulation, kinetics, and data-driven analysis, 
+         with experience across polymerization, biomass conversion, and chemical processes.
+         Trained and experienced in France, Canada, Germany, and Brazil, 
+         I work at the intersection of modeling, experimentation, and process engineering, turning complex systems and 
+         experimental data into insights that support process understanding, optimization, and industrial decision-making.
         </p>
         <!-- atalhos para as seções que vêm depois do modelo -->
         <div class="cta jumps">
@@ -640,7 +641,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
       <div class="cv-row reveal">
         <div class="cv-when mono">2019 — 2020</div>
         <div class="cv-what">
-          <strong>Earlier industry roles · Salvador, Brazil</strong>
+          <strong>Earlier company roles · Salvador, Brazil</strong>
           <ul class="cv-list">
             <li>Project Analyst — Fundo Municipal de Previdência de Salvador (FUMPRES),
                 05/2019 – 10/2020</li>
@@ -673,7 +674,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
     <div class="wrap">
       <div class="sec-head reveal">
         <p class="sec-num mono">05 / PUBLICATIONS</p>
-        <h2>Peer-reviewed work</h2>
+        <h2>Research output</h2>
       </div>
 
       <div class="cv-row reveal">
@@ -1218,16 +1219,12 @@ const tSlider = document.getElementById('tSlider');
 tSlider.addEventListener('input', () => { S.t = +tSlider.value; refresh(); });
 
 const NOTE_BATCH =
-  'Semibatch reactor, ethylene at 7 bar and 80 °C, macroparticle of '+
-  'V<sub>pol</sub> = 2.7 × 10⁶ µm³, followed up to 60 min. Simplified implementation of the '+
-  'multiparticle model — analytical solution of the isothermal reaction–diffusion equation '+
-  'inside each mesoparticle and method of moments for the chain lengths, with the '+
-  'parameters of Tables 2, 4 and 5. The concentration shown is the volume average inside '+
-  'the mesoparticles, C/C<sub>eq</sub>, and the rate is per gram of catalyst, so both can '+
-  'be compared directly with the continuous reactor; the slider moves along those two '+
-  'curves. The molecular weight distribution is accumulated over the whole hour and is '+
-  'therefore always the 60 min one, placed on the number average published in Table 6. '+
-  'The faint curves are the other three distributions, drawn for comparison.';
+  'Semibatch reactor, ethylene at 7 bar and 80 °C. Each mesoparticle size distribution'+
+   'leads to a different result. Smaller structures, such as those in the exponential distribution,'+
+   'reach monomer saturation more quickly due to lower mass-transfer resistance compared to larger' +
+   'structures, such as those in the beta distribution. This difference becomes more pronounced as'+
+   'the reaction productivity increases. As productivity increases, the mesoparticles grow larger,'+
+   'leading to more significant mass-transfer resistance';
 const NOTE_CSTR =
   'Continuous reactor (CSTR) with its residence time distribution, kinetic case 2. The '+
   'article compares the two extreme morphologies here: an <em>exponential</em> '+
@@ -1236,11 +1233,7 @@ const NOTE_CSTR =
   'monomer concentration inside the particle stays closer to saturation and the '+
   'polymerisation rate is higher throughout, which in turn gives longer chains. The slider '+
   'moves along the concentration and rate curves; the molecular weight distribution is '+
-  'accumulated over the whole hour, so it is always the 60 min one. These four curves are '+
-  'taken directly from the published article — nothing is recomputed. Note that a '+
-  'continuous reactor differs from the semibatch in two ways, not one: the particle enters '+
-  'much smaller, which sharpens the diffusion limitation, and the residence time '+
-  'distribution means what leaves the reactor is a mixture of particles of every age.';
+  'accumulated over the whole hour, so it is always the 60 min one.';
 
 function refresh(){
   const cstr = S.reactor === 'cstr';
