@@ -70,7 +70,21 @@ nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);
 h1{font-size:clamp(2rem,5.5vw,3.05rem);line-height:1.08;letter-spacing:-.035em;
   font-weight:700;margin-bottom:14px;}
 .role{font-size:1.04rem;color:var(--muted);font-weight:500;margin-bottom:20px;}
-.pitch{font-size:1.01rem;color:var(--muted);max-width:44ch;margin-bottom:28px;}
+.pitch{
+  font-size:1.01rem;
+  color:var(--muted);
+  max-width:46ch;
+  margin-bottom:28px;
+  hyphens:auto;            /* hifeniza palavras longas; precisa do lang="en" no <html> */
+  -webkit-hyphens:auto;
+  -ms-hyphens:auto;
+}
+@media(min-width:720px){
+  .pitch{
+    text-align:justify;    /* justifica */
+    text-align-last:left;  /* a última linha fica à esquerda, como num livro */
+  }
+}
 .cta{display:flex;flex-wrap:wrap;gap:10px;}
 .btn{display:inline-block;padding:10px 18px;border-radius:9px;text-decoration:none;
   font-size:.9rem;font-weight:500;transition:all .2s;border:1px solid var(--line);color:var(--ink);}
