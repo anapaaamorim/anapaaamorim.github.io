@@ -77,6 +77,18 @@ h1{font-size:clamp(2rem,5.5vw,3.05rem);line-height:1.08;letter-spacing:-.035em;
 .btn:hover{border-color:var(--accent);transform:translateY(-1px);}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600;}
 .btn.primary:hover{opacity:.88;}
+/* atalhos do topo: pastilhas com ícone, uma para cada seção seguinte */
+.cta.jumps{display:flex;flex-wrap:wrap;gap:10px;}
+.btn.jump{display:inline-flex;align-items:center;gap:9px;padding:11px 17px;
+  border-radius:999px;font-size:.89rem;font-weight:500;
+  background:color-mix(in srgb,var(--accent) 9%,transparent);
+  border-color:color-mix(in srgb,var(--accent) 28%,transparent);
+  transition:background .22s,border-color .22s,color .22s,transform .22s,box-shadow .22s;}
+.btn.jump svg{width:17px;height:17px;flex:none;stroke:var(--accent);fill:none;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:stroke .22s,transform .3s;}
+.btn.jump:hover{background:var(--accent);border-color:var(--accent);color:var(--bg);
+  transform:translateY(-2px);box-shadow:0 8px 24px var(--glow);}
+.btn.jump:hover svg{stroke:var(--bg);transform:scale(1.14) rotate(-4deg);}
 
 .particle-card{margin-top:40px;border:1px solid var(--line);border-radius:14px;
   background:var(--panel);padding:16px;box-shadow:0 0 80px var(--glow);}
@@ -127,13 +139,23 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
 .stat .v{font-size:1.02rem;font-weight:500;color:var(--accent2);margin-top:2px;}
 
 .plots{display:grid;gap:0;}
-@media(min-width:760px){.plots{grid-template-columns:repeat(3,1fr);}}
+@media(min-width:760px){
+  .plots[data-n="3"]{grid-template-columns:repeat(3,1fr);}
+  .plots[data-n="4"]{grid-template-columns:repeat(2,1fr);}
+}
 .plot{padding:18px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);}
 .plot:last-child{border-right:none;}
+.plot.hide{display:none;}
 .plot h4{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
   color:var(--muted);font-weight:600;margin-bottom:10px;}
 .plot canvas{width:100%;height:190px;display:block;}
+.legend{display:flex;flex-wrap:wrap;gap:16px;padding:12px 18px;
+  border-bottom:1px solid var(--line);font-size:.74rem;color:var(--muted);}
+.legend b{font-weight:500;}
+.legend i{display:inline-block;width:15px;border-top:2.5px solid currentColor;
+  vertical-align:middle;margin-right:6px;}
 .note{padding:14px 18px;font-size:.78rem;color:var(--muted);}
+.note em{color:var(--ink);font-style:italic;}
 
 /* ---------- cartões / projetos / currículo ---------- */
 .cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
@@ -153,6 +175,38 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
   color:var(--accent);font-weight:600;}
 .project dd{font-size:.95rem;color:var(--muted);margin-bottom:9px;}
 .project dd b{color:var(--ink);font-weight:600;}
+
+/* ---------- cartões que viram ao passar o mouse ----------
+   As duas faces ficam sobrepostas, então o cartão precisa de altura fixa. Ela é
+   medida no navegador (função sizeFlips), pela face mais alta, e refeita quando
+   a janela muda de tamanho — assim o texto nunca é cortado. */
+.flip-grid{display:grid;gap:16px;}
+.flip{perspective:2200px;outline:none;cursor:pointer;height:340px;}
+.flip-in{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+  transition:transform .75s cubic-bezier(.3,.85,.3,1);}
+.flip:hover .flip-in,.flip:focus-visible .flip-in,.flip.open .flip-in{transform:rotateY(180deg);}
+.flip-face{position:absolute;inset:0;border:1px solid var(--line);border-radius:14px;
+  background:var(--panel);padding:26px;display:flex;flex-direction:column;
+  justify-content:center;overflow:hidden;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+.flip-front{transition:border-color .3s,box-shadow .3s;}
+.flip:hover .flip-front{border-color:var(--accent);box-shadow:0 0 50px var(--glow);}
+.flip-front .flip-pad{display:grid;gap:12px;justify-items:start;}
+.flip-num{font-size:.72rem;color:var(--accent);letter-spacing:.16em;}
+.flip-front h3{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:600;
+  letter-spacing:-.03em;line-height:1.12;}
+.flip-hint{font-size:.66rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;}
+.flip-back{transform:rotateY(180deg);background:var(--panel2);border-color:var(--accent);}
+.flip-back .flip-pad{display:grid;gap:26px;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));}
+.fp{max-width:74ch;}         /* linhas legíveis quando há um projeto só */
+.fp h4{font-size:1rem;font-weight:600;margin-bottom:12px;letter-spacing:-.012em;}
+.fp dt{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);font-weight:600;}
+.fp dd{font-size:.88rem;color:var(--muted);margin-bottom:9px;line-height:1.52;}
+.fp dd b{color:var(--ink);font-weight:600;}
+.fp a{color:var(--accent);text-decoration:none;}
+@media(prefers-reduced-motion:reduce){ .flip-in{transition:none;} }
 .cv-row{display:grid;gap:4px;padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid var(--line);}
 @media(min-width:680px){.cv-row{grid-template-columns:150px 1fr;gap:24px;}}
 .cv-when{font-size:.82rem;color:var(--accent);}
@@ -162,6 +216,9 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
 .cv-list li{font-size:.9rem;color:var(--muted);margin-bottom:3px;}
 .cv-what a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;}
 .cv-what a:hover{border-bottom-color:var(--accent);}
+/* dentro de uma linha do currículo, um botão continua botão */
+.cv-what a.btn{color:var(--ink);}
+.cv-what a.btn:hover{border-bottom-color:transparent;color:var(--bg);}
 .contact{text-align:center;padding:76px 0;}
 .contact p{color:var(--muted);max-width:46ch;margin:0 auto 26px;}
 footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
@@ -209,9 +266,23 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
           where modelling meets the plant: predicting failure modes before they cost a
           shutdown, and turning experimental data into decisions.
         </p>
-        <div class="cta">
-          <a class="btn primary" href="#model">Explore the model</a>
-          <a class="btn" href="https://www.linkedin.com/in/ana-paula-a-amorim/">LinkedIn</a>
+        <!-- atalhos para as seções que vêm depois do modelo -->
+        <div class="cta jumps">
+          <a class="btn jump" href="#expertise">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6 14.2 9 20.8 11.2 14.2 13.4 12 20 9.8 13.4 3.2 11.2 9.8 9z"/></svg>
+            What I do</a>
+          <a class="btn jump" href="#projects">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5-9 4.5z"/><path d="M3 12l9 4.5 9-4.5"/><path d="M3 16.5 12 21l9-4.5"/></svg>
+            My projects</a>
+          <a class="btn jump" href="#background">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 8.5 12 4l9.5 4.5L12 13z"/><path d="M6.5 10.8v4.7c0 1.5 2.5 2.7 5.5 2.7s5.5-1.2 5.5-2.7v-4.7"/></svg>
+            My background</a>
+          <a class="btn jump" href="#publications">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5h8L18.5 8v12.5H6z"/><path d="M14 3.5V8h4.5"/><path d="M9 13h6M9 16.5h6"/></svg>
+            My papers</a>
+          <a class="btn jump" href="#contact">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 12.5c0 4-3.8 7.2-8.5 7.2-1 0-2-.15-2.9-.42L4 21l1.4-3.6C4.2 16.1 3.5 14.4 3.5 12.5c0-4 3.8-7.2 8.5-7.2s8.5 3.2 8.5 7.2z"/></svg>
+            Let's talk</a>
         </div>
       </div>
 
@@ -229,28 +300,27 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
       <div class="sec-head reveal">
         <p class="sec-num mono">01 / INTERACTIVE MODEL</p>
         <h2>Internal particle morphology in gas-phase ethylene polymerisation</h2>
-        <p>Choose an internal morphology and watch it propagate to the polymerisation rate
-           and the molecular weight distribution, in a semibatch reactor or in a CSTR with
-           its residence time distribution.</p>
+        <p>Pick a mesoparticle size distribution and follow how the internal morphology of
+           the growing particle propagates to monomer transport, polymerisation rate and
+           molecular weight — in a semibatch reactor, or in a CSTR with its residence time
+           distribution.</p>
       </div>
 
       <div class="model reveal">
 
         <div class="controls">
           <div class="ctrl-group">
-            <span class="ctrl-label">Mesoparticle size distribution</span>
+            <span class="ctrl-label">Reactor</span>
+            <div class="pills" id="reactorPills"></div>
+            <span class="ctrl-label" style="margin-top:8px">Mesoparticle size distribution</span>
             <div class="pills" id="distPills"></div>
           </div>
-          <div style="display:grid;gap:18px">
-            <div class="ctrl-group">
+          <div style="display:grid;gap:18px;align-content:start">
+            <div class="ctrl-group" id="caseGroup">
               <span class="ctrl-label">Kinetics</span>
               <div class="pills" id="casePills"></div>
             </div>
-            <div class="ctrl-group">
-              <span class="ctrl-label">Reactor</span>
-              <div class="pills" id="reactorPills"></div>
-            </div>
-            <div class="ctrl-group">
+            <div class="ctrl-group" id="timeGroup">
               <span class="ctrl-label" id="timeLabel">Reaction time</span>
               <div class="slider-row">
                 <input type="range" id="tSlider" min="5" max="60" step="5" value="60">
@@ -261,40 +331,22 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
         </div>
 
         <div class="stats mono">
-          <div class="stat"><div class="k">mesoparticles</div><div class="v" id="sNp">—</div></div>
-          <div class="stat"><div class="k">M<sub>n</sub> (g/mol)</div><div class="v" id="sMn">—</div></div>
-          <div class="stat"><div class="k">M<sub>w</sub> (g/mol)</div><div class="v" id="sMw">—</div></div>
-          <div class="stat"><div class="k">Đ</div><div class="v" id="sPDI">—</div></div>
+          <div class="stat"><div class="k" id="k1">—</div><div class="v" id="v1">—</div></div>
+          <div class="stat"><div class="k" id="k2">—</div><div class="v" id="v2">—</div></div>
+          <div class="stat"><div class="k" id="k3">—</div><div class="v" id="v3">—</div></div>
+          <div class="stat"><div class="k" id="k4">—</div><div class="v" id="v4">—</div></div>
         </div>
 
-        <div class="plots">
-          <div class="plot">
-            <h4>Mesoparticle size distribution</h4>
-            <canvas id="cDist"></canvas>
-          </div>
-          <div class="plot">
-            <h4>Polymerisation rate</h4>
-            <canvas id="cRate"></canvas>
-          </div>
-          <div class="plot">
-            <h4 id="mwdTitle">Molecular weight distribution · 60 min</h4>
-            <canvas id="cMwd"></canvas>
-          </div>
+        <div class="legend mono" id="legend"></div>
+
+        <div class="plots" id="plots" data-n="4">
+          <div class="plot"><h4 id="t1">—</h4><canvas id="c1"></canvas></div>
+          <div class="plot"><h4 id="t2">—</h4><canvas id="c2"></canvas></div>
+          <div class="plot"><h4 id="t3">—</h4><canvas id="c3"></canvas></div>
+          <div class="plot" id="p4"><h4 id="t4">—</h4><canvas id="c4"></canvas></div>
         </div>
 
-        <p class="note">
-          Simplified implementation of the multiparticle model of
-          <em>Alves Amorim et al., Ind. Eng. Chem. Res.</em> (2026): analytical solution of the
-          isothermal reaction–diffusion equation in each mesoparticle, method of moments for
-          the chain lengths, and an exponential residence time distribution for the CSTR.
-          Ethylene, 7 bar, 80 °C. In semibatch the particle starts as a 172 µm
-          prepolymer and all six distributions are available. The CSTR is reactor 1 of the
-          two-reactor cascade of Section 3.2: the prepolymer enters at 20 µm, the paper
-          compares only the exponential and beta distributions there, and the curve is the
-          profile of a single particle against its residence time — what leaves the reactor
-          is the residence-time-weighted average, marked by the dashed line. The faint
-          curves are the other distributions, drawn for comparison.
-        </p>
+        <p class="note" id="note"></p>
       </div>
     </div>
   </section>
@@ -355,103 +407,168 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
       <div class="sec-head reveal">
         <p class="sec-num mono">03 / SELECTED WORK</p>
         <h2>Projects</h2>
+        <p>Four areas of work. Hover over a card — or tap it — to turn it over.</p>
       </div>
 
-      <article class="project reveal">
-        <span class="tag mono">Modelling &amp; simulation</span>
-        <h3>Thermodynamic modelling of polyethylene dissolution to avoid
-            reactor shutdowns</h3>
-        <dl>
-          <dt>Problem</dt>
-          <dd>Polymer dissolving into the diluent causes gelation and fouling, and there
-              was no reliable way to predict when it would happen — so operating limits
-              were set conservatively, or discovered the hard way.</dd>
-          <dt>Approach</dt>
-          <dd>Built a thermodynamic model from the Sanchez-Lacombe equation of state,
-              applied to polyethylene sorption and swelling in slurry and gas phase. Part
-              of the work was carried out at the University of Alberta.</dd>
-          <dt>Result</dt>
-          <dd><b>First predictive model of polyethylene dissolution reported in the
-              literature.</b> A tool to prevent gelation, reduce the risk of costly
-              production shutdowns and support reactor scale-up.</dd>
-        </dl>
-      </article>
+      <!-- cada cartão mostra a disciplina na frente e os projetos no verso -->
+      <div class="flip-grid reveal">
 
-      <article class="project reveal">
-        <span class="tag mono">Modelling &amp; simulation</span>
-        <h3>Multiparticle model of olefin polymerisation</h3>
-        <dl>
-          <dt>Problem</dt>
-          <dd>Polymer properties depend on a particle morphology that cannot be measured
-              during reaction, so its effect on rate and molecular weight could not be
-              quantified.</dd>
-          <dt>Approach</dt>
-          <dd>Built the growing particle as an assembly of mesoparticles of distributed
-              size, coupling mass transfer and kinetics, then extended it from batch to a
-              continuous reactor using Monte Carlo sampling of the residence time
-              distribution.</dd>
-          <dt>Result</dt>
-          <dd><b>A route from a morphology nobody can measure to the properties that
-              define the grade.</b> The model explains why two batches from the same recipe
-              come out different, and shows which operating conditions keep rate and
-              molecular weight on target. Published in <em>Ind. Eng. Chem. Res.</em> (2026)
-              — and running live
-              <a href="#model" style="color:var(--accent);text-decoration:none">at the top
-              of this page</a>.</dd>
-        </dl>
-      </article>
+        <div class="flip" tabindex="0">
+          <div class="flip-in">
+            <div class="flip-face flip-front"><div class="flip-pad">
+              <span class="flip-num mono">01</span>
+              <h3>Modelling &amp; simulation</h3>
+              <span class="flip-hint mono">2 projects · hover to flip</span>
+            </div></div>
+            <div class="flip-face flip-back"><div class="flip-pad">
+              <div class="fp">
+                <h4>Thermodynamic modelling of polyethylene dissolution to avoid
+                    reactor shutdowns</h4>
+                <dl>
+                  <dt>Problem</dt>
+                  <dd>Polymer dissolving into the diluent causes gelation and fouling, and
+                      there was no reliable way to predict when it would happen — so
+                      operating limits were set conservatively, or discovered the hard
+                      way.</dd>
+                  <dt>Approach</dt>
+                  <dd>Built a thermodynamic model from the Sanchez-Lacombe equation of
+                      state, applied to polyethylene sorption and swelling in slurry and gas
+                      phase. Part of the work was carried out at the University of
+                      Alberta.</dd>
+                  <dt>Result</dt>
+                  <dd><b>First predictive model of polyethylene dissolution reported in the
+                      literature.</b> A tool to prevent gelation, reduce the risk of costly
+                      production shutdowns and support reactor scale-up.</dd>
+                </dl>
+              </div>
+              <div class="fp">
+                <h4>Multiparticle model of olefin polymerisation</h4>
+                <dl>
+                  <dt>Problem</dt>
+                  <dd>Polymer properties depend on a particle morphology that cannot be
+                      measured during reaction, so its effect on rate and molecular weight
+                      could not be quantified.</dd>
+                  <dt>Approach</dt>
+                  <dd>Built the growing particle as an assembly of mesoparticles of
+                      distributed size, coupling mass transfer and kinetics, then extended it
+                      from batch to a continuous reactor using Monte Carlo sampling of the
+                      residence time distribution.</dd>
+                  <dt>Result</dt>
+                  <dd><b>A route from a morphology nobody can measure to the properties that
+                      define the grade.</b> Published in <em>Ind. Eng. Chem. Res.</em>
+                      (2026) — its results are
+                      <a href="#model">at the top of this page</a>.</dd>
+                </dl>
+              </div>
+            </div></div>
+          </div>
+        </div>
 
-      <article class="project reveal">
-        <span class="tag mono">Optimisation &amp; decision support</span>
-        <h3>Cost optimisation of renewable microgrids</h3>
-        <dl>
-          <dt>Problem</dt>
-          <dd>Microgrid design studies assume constant equipment efficiency, which
-              overstates performance and leads to oversized, more expensive systems.</dd>
-          <dt>Approach</dt>
-          <dd>Developed a mixed-integer nonlinear optimisation framework in GAMS and Python
-              accounting for the real, time-varying efficiency of solar, wind and biogas
-              units, with clustering used to reduce the dimensionality of the problem.</dd>
-          <dt>Result</dt>
-          <dd><b>45 % reduction in total system cost</b>, with demand met in full. The
-              same framework transfers to utility sizing and energy integration on an
-              industrial site, where equipment also runs far from nameplate efficiency.
-              Published in <em>Chemical Engineering Research and Design</em> (2025).</dd>
-        </dl>
-      </article>
+        <div class="flip" tabindex="0">
+          <div class="flip-in">
+            <div class="flip-face flip-front"><div class="flip-pad">
+              <span class="flip-num mono">02</span>
+              <h3>Optimisation &amp; decision support</h3>
+              <span class="flip-hint mono">1 project · hover to flip</span>
+            </div></div>
+            <div class="flip-face flip-back"><div class="flip-pad">
+              <div class="fp">
+                <h4>Cost optimisation of renewable microgrids</h4>
+                <dl>
+                  <dt>Problem</dt>
+                  <dd>Microgrid design studies assume constant equipment efficiency, which
+                      overstates performance and leads to oversized, more expensive
+                      systems.</dd>
+                  <dt>Approach</dt>
+                  <dd>Developed a mixed-integer nonlinear optimisation framework in GAMS and
+                      Python accounting for the real, time-varying efficiency of solar, wind
+                      and biogas units, with clustering used to reduce the dimensionality of
+                      the problem.</dd>
+                  <dt>Result</dt>
+                  <dd><b>45 % reduction in total system cost</b>, with demand met in full.
+                      The same framework transfers to utility sizing and energy integration
+                      on an industrial site, where equipment also runs far from nameplate
+                      efficiency. Published in <em>Chemical Engineering Research and
+                      Design</em> (2025).</dd>
+                </dl>
+              </div>
+            </div></div>
+          </div>
+        </div>
 
-      <article class="project reveal">
-        <span class="tag mono">Continuous improvement</span>
-        <h3>Lean Six Sigma on a high-volume service process</h3>
-        <dl>
-          <dt>Problem</dt>
-          <dd>Users of a municipal pension fund faced long and unpredictable waiting times,
-              with no clear picture of where the delay came from.</dd>
-          <dt>Approach</dt>
-          <dd>Led a DMAIC project as a certified Green Belt: mapped the user journey,
-              eliminated waste, rebalanced flows and standardised tasks. Process modelling
-              and automation in BPM and VBA.</dd>
-          <dt>Result</dt>
-          <dd><b>71 % reduction in average lead time</b>, brought under 15 minutes, and a
-              lasting improvement in service level. The DMAIC cycle behind it is the same
-              one used on a production line to attack changeover time or scrap.</dd>
-        </dl>
-      </article>
+        <div class="flip" tabindex="0">
+          <div class="flip-in">
+            <div class="flip-face flip-front"><div class="flip-pad">
+              <span class="flip-num mono">03</span>
+              <h3>Continuous improvement</h3>
+              <span class="flip-hint mono">1 project · hover to flip</span>
+            </div></div>
+            <div class="flip-face flip-back"><div class="flip-pad">
+              <div class="fp">
+                <h4>Lean Six Sigma on a high-volume service process</h4>
+                <dl>
+                  <dt>Problem</dt>
+                  <dd>Users of a municipal pension fund faced long and unpredictable waiting
+                      times, with no clear picture of where the delay came from.</dd>
+                  <dt>Approach</dt>
+                  <dd>Led a DMAIC project as a certified Green Belt: mapped the user journey,
+                      eliminated waste, rebalanced flows and standardised tasks. Process
+                      modelling and automation in BPM and VBA.</dd>
+                  <dt>Result</dt>
+                  <dd><b>71 % reduction in average lead time</b>, brought under 15 minutes,
+                      and a lasting improvement in service level. The DMAIC cycle behind it
+                      is the same one used on a production line to attack changeover time or
+                      scrap.</dd>
+                </dl>
+              </div>
+            </div></div>
+          </div>
+        </div>
 
-      <article class="project reveal">
-        <span class="tag mono">Management &amp; automation</span>
-        <h3>Automation of a manual task in the paint industry</h3>
-        <dl>
-          <dt>Problem</dt>
-          <dd>A recurring task was being done by hand, consuming working hours and exposing
-              the results to transcription errors.</dd>
-          <dt>Approach</dt>
-          <dd>Designed and deployed an automated system in VBA.</dd>
-          <dt>Result</dt>
-          <dd><b>Around 99.5 % less working time</b> spent on the task, and transcription
-              errors removed from the chain.</dd>
-        </dl>
-      </article>
+        <div class="flip" tabindex="0">
+          <div class="flip-in">
+            <div class="flip-face flip-front"><div class="flip-pad">
+              <span class="flip-num mono">04</span>
+              <h3>Management &amp; automation</h3>
+              <span class="flip-hint mono">2 projects · hover to flip</span>
+            </div></div>
+            <div class="flip-face flip-back"><div class="flip-pad">
+              <div class="fp">
+                <h4>Automated management tool for the internal departments of a
+                    municipal pension fund</h4>
+                <dl>
+                  <dt>Problem</dt>
+                  <dd>Work moving between the internal departments of the fund had no shared
+                      view of where each case stood, so coordination depended on people
+                      chasing one another and payments could slip past their deadline.</dd>
+                  <dt>Approach</dt>
+                  <dd>Designed and built a complete automated tool in VBA covering the
+                      internal workflow end to end: each step recorded as it happened, with
+                      status and deadlines tracked in one place.</dd>
+                  <dt>Result</dt>
+                  <dd><b>Tighter control of the processes and much closer follow-up</b>,
+                      with significant gains in how work moved between departments and
+                      <b>no more late payments</b>.</dd>
+                </dl>
+              </div>
+              <div class="fp">
+                <h4>Automation of a manual task in the paint industry</h4>
+                <dl>
+                  <dt>Problem</dt>
+                  <dd>A recurring task was being done by hand, consuming working hours and
+                      exposing the results to transcription errors.</dd>
+                  <dt>Approach</dt>
+                  <dd>Designed and deployed an automated system in VBA.</dd>
+                  <dt>Result</dt>
+                  <dd><b>Around 99.5 % less working time</b> spent on the task, and
+                      transcription errors removed from the chain.</dd>
+                </dl>
+              </div>
+            </div></div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </section>
 
@@ -616,8 +733,10 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
       <div class="cv-row reveal">
         <div class="cv-when mono">Full list</div>
         <div class="cv-what">
-          <strong><a href="https://orcid.org/0000-0002-2237-6055" target="_blank"
-                     rel="noopener">ORCID 0000-0002-2237-6055</a></strong>
+          <a class="btn jump" href="https://orcid.org/0000-0002-2237-6055"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 14v5.5a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 3 19.5v-12A1.5 1.5 0 0 1 4.5 6H10"/></svg>
+            ORCID</a>
         </div>
       </div>
     </div>
@@ -633,7 +752,6 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:.82rem;
       <div class="cta" style="justify-content:center">
         <a class="btn primary" href="mailto:anapaa.amorim@gmail.com">anapaa.amorim@gmail.com</a>
         <a class="btn" href="https://www.linkedin.com/in/ana-paula-a-amorim/">LinkedIn</a>
-        <a class="btn" href="https://orcid.org/0000-0002-2237-6055">ORCID</a>
       </div>
     </div>
   </section>
@@ -657,7 +775,56 @@ themeBtn.addEventListener('click', () => setTheme(root.getAttribute('data-theme'
 function css(v){ return getComputedStyle(root).getPropertyValue(v).trim(); }
 
 /* ============================================================
-   2. PARÂMETROS DO MODELO  (Tabela 4 do artigo, 7 bar de C2H4, 80 °C)
+   2. DADOS DO ARTIGO
+   Alves Amorim et al., Ind. Eng. Chem. Res. (2026) — doi 10.1021/acs.iecr.6c00085
+   ============================================================ */
+
+/* Tabela 2 — as quatro distribuições que o artigo simula com reação */
+const DISTS = [
+  { id:1, name:'Gaussian',     sub:'μ 6 µm · σ 0.9', kind:'gauss',  mu:6, sd:0.9 },
+  { id:4, name:'Exponential',  sub:'μ 1 µm',         kind:'exp',    mu:1         },
+  { id:5, name:'Single value', sub:'r 6 µm',         kind:'single', x:6          },
+  { id:6, name:'Beta',         sub:'α 10⁷ · β 10⁶',  kind:'beta',   a:10e6, b:1e6 }
+];
+const dName = id => DISTS.find(d => d.id === id).name;
+
+/* Tabela 5 — casos cinéticos */
+const CASES = [
+  { id:1, name:'Case 1', sub:'kp 1.12e3', kp:1.12e3 },
+  { id:2, name:'Case 2', sub:'kp 5e3',    kp:5e3    },
+  { id:3, name:'Case 3', sub:'kp 1.5e4',  kp:1.5e4  }
+];
+
+/* Tabela 6 — [Mn, Mw] em g/mol na semibatelada, 60 min. São estes os valores
+   mostrados no painel; a curva de MMD do modelo é deslocada para ter este Mn. */
+const T6 = {
+  1:{ 1:[1430, 2880], 4:[1490, 3000], 5:[1450, 2900], 6:[1320, 2670] },
+  2:{ 1:[5020,10500], 4:[5920,12200], 5:[5250,10900], 6:[3640, 8600] },
+  3:{ 1:[9300,23900], 4:[13800,31700],5:[9700,24300], 6:[6500,19800] }
+};
+
+/* Curvas do reator contínuo lidas ponto a ponto das figuras do artigo, para as
+   distribuições exponencial (d4) e beta (d6). Nada aqui é recalculado.
+   dist: raio (µm) → % de mesopartículas  ·  conc: tempo (min) → C/Ceq
+   rate: tempo (min) → kg PE / g cat · h  ·  mwd: log₁₀ M → w(log M)            */
+
+const FIG = {
+  dist:{ d4:[[0.99,16.705],[1.07,15.789],[1.2,13.92],[1.28,12.791],[1.41,11.24],[1.5,10.359],[1.58,9.548],[1.71,8.384],[1.79,7.75],[1.87,7.115],[2,6.269],[2.08,5.74],[2.21,5.07],[2.29,4.647],[2.38,4.294],[2.5,3.765],[2.59,3.483],[2.67,3.201],[2.8,2.814],[2.88,2.602],[3.01,2.285],[3.1,2.108],[3.18,1.932],[3.31,1.685],[3.39,1.544],[3.47,1.438],[3.6,1.262],[3.68,1.192],[3.81,1.051],[3.9,0.945],[3.98,0.874],[4.11,0.769],[4.19,0.698],[4.27,0.663],[4.4,0.592],[4.48,0.522],[4.61,0.451],[4.7,0.451],[4.78,0.381],[4.91,0.345],[4.99,0.31],[5.07,0.31],[5.2,0.275],[5.28,0.24],[5.41,0.24],[5.5,0.24],[7,0.05],[10,0.04]],
+        d6:[[1,0.04],[4,0.05],[6.04,0.24],[6.13,0.24],[6.21,0.24],[6.29,0.275],[6.38,0.275],[6.46,0.345],[6.55,0.345],[6.63,0.416],[6.72,0.487],[6.8,0.522],[6.88,0.557],[6.97,0.628],[7.05,0.698],[7.14,0.769],[7.22,0.91],[7.3,0.98],[7.39,1.086],[7.47,1.192],[7.56,1.333],[7.64,1.474],[7.73,1.65],[7.81,1.791],[7.89,2.003],[7.98,2.144],[8.06,2.355],[8.15,2.602],[8.23,2.884],[8.32,3.166],[8.4,3.448],[8.48,3.765],[8.57,4.118],[8.65,4.506],[8.74,4.929],[8.82,5.352],[8.9,5.811],[8.99,6.339],[9.07,6.868],[9.16,7.538],[9.24,8.102],[9.33,8.807],[9.41,9.548],[9.49,10.323],[9.58,11.24],[9.66,12.122],[9.75,13.109],[9.83,13.849]] },
+  conc:{ d4:[[2.1,0.8906],[3.7,0.9212],[5,0.9322],[6.5,0.9387],[8.1,0.9453],[9.4,0.9475],[11,0.9497],[12.3,0.9519],[13.9,0.954],[15.5,0.954],[16.8,0.9562],[18.3,0.9584],[19.9,0.9584],[21.2,0.9584],[22.8,0.9606],[24.4,0.9628],[25.7,0.9628],[27.2,0.9628],[28.8,0.9628],[30.1,0.965],[31.7,0.965],[33,0.965],[34.6,0.9672],[36.2,0.9672],[37.5,0.9672],[39,0.9672],[40.6,0.9672],[41.9,0.9672],[43.5,0.9672],[45.1,0.9694],[46.4,0.9694],[47.9,0.9694],[49.5,0.9694],[50.8,0.9716],[52.4,0.9716],[53.7,0.9716],[55.3,0.9716],[56.9,0.9716],[58.2,0.9716],[59.7,0.9716]],
+        d6:[[2.1,0.6455],[3.7,0.6915],[5,0.7133],[6.5,0.733],[8.1,0.7462],[9.4,0.7549],[11,0.7659],[12.3,0.7724],[13.9,0.7812],[15.5,0.7856],[16.8,0.7899],[18.3,0.7965],[19.9,0.8009],[21.2,0.8031],[22.8,0.8074],[24.4,0.8118],[25.7,0.8162],[27.2,0.8184],[28.8,0.8206],[30.1,0.8249],[31.7,0.8249],[33,0.8293],[34.6,0.8293],[36.2,0.8337],[37.5,0.8337],[39,0.8381],[40.6,0.8381],[41.9,0.8425],[43.5,0.8425],[45.1,0.8446],[46.4,0.8468],[47.9,0.8468],[49.5,0.849],[50.8,0.8512],[52.4,0.8512],[53.7,0.8512],[55.3,0.8534],[56.9,0.8556],[58.2,0.8556],[59.7,0.8578]] },
+  rate:{ d4:[[2.1,15.92],[3.7,16.46],[5,16.68],[6.5,16.8],[8.1,16.87],[9.4,16.95],[11,16.99],[12.3,17.03],[13.9,17.06],[15.5,17.1],[16.8,17.1],[18.3,17.14],[19.9,17.14],[21.2,17.18],[22.8,17.18],[24.4,17.18],[25.7,17.22],[27.2,17.22],[28.8,17.25],[30.1,17.25],[31.7,17.25],[33,17.25],[34.6,17.25],[36.2,17.29],[37.5,17.29],[39,17.29],[40.6,17.33],[41.9,17.33],[43.5,17.33],[45.1,17.33],[46.4,17.33],[47.9,17.33],[49.5,17.33],[50.8,17.33],[52.4,17.33],[53.7,17.37],[55.3,17.37],[56.9,17.37],[58.2,17.37],[59.7,17.37]],
+        d6:[[2.1,11.55],[3.7,12.31],[5,12.77],[6.5,13.11],[8.1,13.34],[9.4,13.49],[11,13.72],[12.3,13.8],[13.9,13.95],[15.5,14.06],[16.8,14.18],[18.3,14.25],[19.9,14.33],[21.2,14.4],[22.8,14.48],[24.4,14.56],[25.7,14.56],[27.2,14.63],[28.8,14.71],[30.1,14.71],[31.7,14.78],[33,14.82],[34.6,14.86],[36.2,14.9],[37.5,14.94],[39,14.97],[40.6,15.01],[41.9,15.01],[43.5,15.09],[45.1,15.09],[46.4,15.13],[47.9,15.16],[49.5,15.16],[50.8,15.2],[52.4,15.24],[53.7,15.24],[55.3,15.28],[56.9,15.32],[58.2,15.32],[59.7,15.32]] },
+  mwd:{ d4:[[2.721,0.0014],[2.757,0.0014],[2.794,0.0017],[2.83,0.0022],[2.866,0.0026],[2.939,0.0036],[2.975,0.0043],[3.011,0.005],[3.048,0.0058],[3.084,0.007],[3.12,0.0082],[3.156,0.0094],[3.193,0.0108],[3.265,0.0146],[3.302,0.0168],[3.338,0.0194],[3.374,0.0221],[3.41,0.0249],[3.447,0.0285],[3.483,0.0324],[3.519,0.0367],[3.556,0.0412],[3.628,0.0508],[3.664,0.0566],[3.701,0.0621],[3.737,0.0679],[3.773,0.0741],[3.81,0.0799],[3.846,0.0859],[3.882,0.0911],[3.955,0.101],[3.991,0.1043],[4.027,0.1067],[4.063,0.1077],[4.1,0.1077],[4.136,0.1062],[4.172,0.1031],[4.209,0.0986],[4.245,0.0933],[4.317,0.0779],[4.354,0.0691],[4.39,0.0597],[4.426,0.0504],[4.463,0.0415],[4.499,0.0329],[4.535,0.0254],[4.571,0.0189],[4.644,0.0094],[4.68,0.0058],[4.717,0.0038],[4.753,0.0022],[4.789,0.0014]],
+        d6:[[2.467,0.0014],[2.503,0.0014],[2.54,0.0017],[2.612,0.0022],[2.649,0.0026],[2.685,0.0034],[2.721,0.0038],[2.794,0.0053],[2.83,0.006],[2.866,0.0072],[2.902,0.0082],[2.939,0.0096],[3.011,0.0127],[3.048,0.0149],[3.084,0.0168],[3.12,0.0192],[3.156,0.0216],[3.229,0.0278],[3.265,0.0314],[3.302,0.0355],[3.338,0.0393],[3.41,0.0482],[3.447,0.0525],[3.483,0.0576],[3.519,0.0628],[3.556,0.0681],[3.628,0.0775],[3.664,0.0818],[3.701,0.0861],[3.737,0.0897],[3.773,0.0928],[3.846,0.0966],[3.882,0.0976],[3.918,0.0976],[3.955,0.0964],[4.027,0.0909],[4.063,0.0871],[4.1,0.0818],[4.136,0.0763],[4.172,0.0703],[4.245,0.0571],[4.281,0.0501],[4.317,0.0432],[4.354,0.0365],[4.39,0.0297],[4.463,0.0189],[4.499,0.0144],[4.535,0.0108],[4.571,0.0077],[4.644,0.0034],[4.68,0.0022],[4.717,0.0017]] },
+};
+
+
+/* ============================================================
+   3. MODELO DA SEMIBATELADA  (Tabela 4 do artigo, 7 bar de C2H4, 80 °C)
+   Implementação simplificada do modelo multipartícula: solução analítica da
+   equação de reação-difusão em cada mesopartícula e método dos momentos para os
+   comprimentos de cadeia. Usada apenas no painel da semibatelada.
    ============================================================ */
 const P = {
   rhoP  : 960,        // kg/m3   densidade do polímero
@@ -673,33 +840,13 @@ const P = {
   Cstar : 0.97,       // mol/m3(cat)  concentração de sítios ativos
   PH2   : 1e5,        // Pa
   kH2   : 50,         // m3/mol/s  transferência para H2 (ajustado para Mn bater com a Tabela 6)
-  Vpol0 : 2.7e-12,    // m3   semibatelada: macropartícula de 172 µm
-  /* Reator 1 da cascata: o prepolímero entra com 10–30 µm, média 20 µm (seção 3.2 do
-     artigo). A partícula é muito menor, então a concentração de sítios por m³ de
-     polímero é muito maior e a limitação difusional é bem mais severa. */
-  VpolCSTR : (4/3)*Math.PI*Math.pow(10e-6, 3)
+  Vpol0 : 2.7e-12     // m3   macropartícula da seção 3.1 (Vpol = 2,7 × 10⁶ µm³)
 };
 P.H2 = P.PH2 / (P.Rg * P.T);   // mol/m3
 P.kt = P.kH2 * P.H2;           // 1/s   frequência de transferência
 
-/* Tabela 2 — as seis distribuições de tamanho */
-const DISTS = [
-  { id:1, name:'Gaussian',     sub:'μ 6 · σ 0.9',  kind:'gauss',  mu:6, sd:0.9 },
-  { id:2, name:'Gaussian',     sub:'μ 6 · σ 5',    kind:'gauss',  mu:6, sd:5   },
-  { id:3, name:'Gaussian',     sub:'μ 8 · σ 0.9',  kind:'gauss',  mu:8, sd:0.9 },
-  { id:4, name:'Exponential',  sub:'μ 1 µm',       kind:'exp',    mu:1         },
-  { id:5, name:'Single value', sub:'r 6 µm',       kind:'single', x:6          },
-  { id:6, name:'Beta',         sub:'α 10e6 · β 1e6', kind:'beta', a:10e6, b:1e6 }
-];
-/* Tabela 5 — casos cinéticos */
-const CASES = [
-  { id:1, name:'Case 1', sub:'kp 1.1e3', kp:1.12e3 },
-  { id:2, name:'Case 2', sub:'kp 5e3',   kp:5e3    },
-  { id:3, name:'Case 3', sub:'kp 1.5e4', kp:1.5e4  }
-];
-
 /* ---- monta as classes discretas de tamanho de mesopartícula ---- */
-function buildClasses(d, Vpol0){
+function buildClasses(d){
   const NR = 91, r = [], w = [];
   for (let i = 0; i < NR; i++) r.push(P.a1 + (P.an - P.a1) * i / (NR - 1));
   if (d.kind === 'gauss')  r.forEach(x => w.push(Math.exp(-((x-d.mu)**2)/(2*d.sd*d.sd))));
@@ -718,26 +865,24 @@ function buildClasses(d, Vpol0){
   const n  = w.map(v => v/sw);                                  // frações numéricas
   const r3 = n.reduce((a,v,i) => a + v*r[i]**3, 0);             // <r³>
   const vf = n.map((v,i) => v*r[i]**3/r3);                      // frações volumétricas
-  const np = Vpol0 / ((4/3)*Math.PI*1e-18*r3);                   // total de mesopartículas
+  const np = P.Vpol0 / ((4/3)*Math.PI*1e-18*r3);                // total de mesopartículas
   return { r, n, vf, np, rMean: n.reduce((a,v,i) => a+v*r[i], 0) };
 }
 
 /* ---- fator de eficiência da esfera, reação de primeira ordem ---- */
 const eta = phi => 3/phi * (1/Math.tanh(phi) - 1/phi);
 
-/* ============================================================
-   3. SIMULAÇÃO
-   ============================================================ */
-function simulate(distId, caseId, reactor, tMin){
+/* A reação é integrada uma única vez, de 0 a 60 min, com um passo de 1 min. As
+   curvas de concentração e de taxa são funções do tempo, então o controle
+   deslizante apenas corta a série no instante escolhido — não é preciso refazer o
+   cálculo. A MMD, ao contrário, é acumulada ao longo de toda a reação e é sempre
+   mostrada aos 60 min, como no artigo. */
+function simulate(distId, caseId){
   const d  = DISTS.find(x => x.id === distId);
   const kp = CASES.find(x => x.id === caseId).kp;
-  const cstr = reactor === 'cstr';
-  const Vpol0 = cstr ? P.VpolCSTR : P.Vpol0;
-  const cl = buildClasses(d, Vpol0);
+  const cl = buildClasses(d);
 
-  const tauS  = tMin * 60;
-  const tEnd  = cstr ? 5*tauS : tauS;                 // integra até 5τ por causa da DTR
-  const STEPS = 40, dt = tEnd/STEPS, KR = 11;
+  const STEPS = 60, dt = 60, KR = 11;        // 60 passos de 1 min → times[i] = i min
 
   /* malha de comprimento de cadeia, para a MMD */
   const NJ = 84, nGrid = [], wGrid = new Float64Array(NJ);
@@ -755,7 +900,7 @@ function simulate(distId, caseId, reactor, tMin){
      são fixos, então a concentração de sítios cai conforme ela cresce. As mesopartículas
      maiores sofrem mais limitação de transferência de massa e por isso crescem mais
      devagar — uma das conclusões do artigo. */
-  const Cv0 = P.Cstar * P.Vcat / Vpol0;          // sítios por m³ de polímero em t = 0
+  const Cv0 = P.Cstar * P.Vcat / P.Vpol0;        // sítios por m³ de polímero em t = 0
   const keep = [], Vi = [], Vi0 = [], Ni = [];
   cl.vf.forEach((v,i) => {
     if (v <= 5e-4) return;
@@ -763,12 +908,12 @@ function simulate(distId, caseId, reactor, tMin){
     keep.push(i); Vi.push(V0); Vi0.push(V0); Ni.push(cl.np*cl.n[i]);
   });
 
-  let sumN = 0, sumN2 = 0, sumCh = 0, avgNum = 0, avgDen = 0;
-  const times = [], rates = [], rGrow = [];
+  let sumN = 0, sumN2 = 0, sumCh = 0;
+  const times = [], rates = [], concs = [], rGrow = [];
 
   for (let s = 0; s <= STEPS; s++){
     const t = s*dt;
-    let rateMol = 0;
+    let rateMol = 0, volSum = 0, concSum = 0;
     const contrib = [];
 
     for (let q = 0; q < keep.length; q++){
@@ -780,6 +925,10 @@ function simulate(distId, caseId, reactor, tMin){
       const wi  = Ni[q]*ri;                                  // mol/s, esta classe
       rateMol += wi;
       rGrow[q] = ri*P.mMon/P.rhoP;                           // dV/dt
+      /* integrando a eq. 8 sobre o volume da esfera, a concentração média de
+         monômero dividida por Ceq é exatamente o fator de eficiência η(Φ) */
+      volSum  += Ni[q]*Vi[q];
+      concSum += Ni[q]*Vi[q]*eta(phi);
       for (let k = 0; k < KR; k++){
         const x = (k + 0.5)/KR;
         const C = P.Ceq*Math.sinh(x*phi)/(x*sh);             // eq. 8 do artigo
@@ -788,17 +937,11 @@ function simulate(distId, caseId, reactor, tMin){
     }
 
     times.push(t/60);
-    rates.push(rateMol*P.mMon/(P.Vcat*P.rhoCat));            // kg PE / kg cat / s
+    rates.push(rateMol*P.mMon/(P.Vcat*P.rhoCat)*3600/1000);  // kg PE / g cat / h
+    concs.push(concSum/volSum);                              // C média / Ceq
 
     let wt = dt;
     if (s === 0 || s === STEPS) wt *= 0.5;
-    if (cstr){
-      const E = Math.exp(-t/tauS)/tauS;                      // E(t) da DTR exponencial
-      wt *= Math.exp(-t/tauS);
-      avgNum += E*rates[rates.length-1]*dt;                  // média de estado estacionário
-      avgDen += E*dt;
-    }
-
     for (const [w, p] of contrib){
       const om = wt*w;                                       // mols de monômero
       sumCh += om*(1-p);                                     // cadeias formadas
@@ -821,12 +964,26 @@ function simulate(distId, caseId, reactor, tMin){
 
   const Mn = P.mMon*1000*sumN/sumCh;        // g/mol
   const Mw = P.mMon*1000*sumN2/sumN;
-  return {
-    cl, times, rates, Mn, Mw, PDI: Mw/Mn,
-    avgRate: avgDen > 0 ? avgNum/avgDen : null,
-    mwd: { x: nGrid.map(n => Math.log10(n*P.mMon*1000)), y: [...wGrid] }
-  };
+  return { cl, times, rates, concs, Mn, Mw, PDI: Mw/Mn,
+           mwd: { x: nGrid.map(n => Math.log10(n*P.mMon*1000)), y: [...wGrid] } };
 }
+
+/* O modelo simplificado acerta a forma das curvas, mas superestima a massa molar
+   quando a atividade é alta, porque não resolve o gradiente na escala da
+   macropartícula. Então a MMD é deslocada no eixo log M para que o seu Mn seja o
+   valor publicado na Tabela 6. Cada combinação distribuição/caso é integrada uma
+   só vez e guardada aqui. */
+const SIM = {};
+function sim(distId, caseId){
+  const k = distId + '-' + caseId;
+  if (!SIM[k]){
+    const R = simulate(distId, caseId), t6 = T6[caseId][distId];
+    R.shift = t6 ? Math.log10(t6[0]/R.Mn) : 0;
+    SIM[k] = R;
+  }
+  return SIM[k];
+}
+
 
 /* ============================================================
    4. FUNÇÕES AUXILIARES DE DESENHO
@@ -867,7 +1024,6 @@ function curve(c, pts, col, wid, alpha){
   else c.globalAlpha = alpha;
   c.stroke(); c.shadowBlur = 0; c.globalAlpha = 1;
 }
-
 /* ---- escala de cor: 0 = clara, 1 = saturada ---- */
 function ramp(u){
   const dark = root.getAttribute('data-theme') === 'dark';
@@ -876,94 +1032,146 @@ function ramp(u){
   const f = Math.max(0, Math.min(1, u))**0.8;
   return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*f)).join(',')})`;
 }
-
-/* ============================================================
-   5. DESENHO DOS GRÁFICOS
-   ============================================================ */
-let S = { dist:1, case:2, reactor:'batch', t:60 };
-let ALL = null, RES = null, PACK = null, ACTIVE = [];
-
-/* No reator contínuo o artigo compara só as distribuições 4 (exponencial) e 6 (beta),
-   que são os extremos de tamanho de mesopartícula (Figura 13). */
-const cstrDists = () => DISTS.filter(d => d.id === 4 || d.id === 6);
-
-function drawDist(){
-  const g = prep(document.getElementById('cDist')); if (!g) return;
-  const { c, w, h } = g;
-  const m = { l:30, r:8, t:8, b:26 };
-  const { r, n } = RES.cl, mx = Math.max(...n);
-  const A = axes(c, w, h, m,
-    [[0,'1'],[0.5,'5.5'],[1,'10']],
-    [[0,'0'],[0.5,''],[1,mx.toFixed(2)]], 'mesoparticle radius (µm)');
-  const bw = (A.X(1)-A.X(0))/r.length;
-  r.forEach((rv,i) => {
-    if (n[i] <= 0) return;
-    const u = (rv-P.a1)/(P.an-P.a1), y = A.Y(n[i]/mx);
-    c.fillStyle = ramp(0.25+0.75*n[i]/mx);
-    c.fillRect(A.X(u)-bw/2, y, Math.max(bw*0.9,1.4), A.Y(0)-y);
-  });
+/* ---- lê uma curva publicada num ponto qualquer, por interpolação linear ---- */
+function readAt(series, x){
+  if (x <= series[0][0]) return series[0][1];
+  const last = series[series.length-1];
+  if (x >= last[0]) return last[1];
+  for (let i = 1; i < series.length; i++){
+    if (series[i][0] >= x){
+      const [x0,y0] = series[i-1], [x1,y1] = series[i];
+      return y0 + (y1-y0)*(x-x0)/(x1-x0);
+    }
+  }
+  return last[1];
 }
 
-/* as outras distribuições ficam esmaecidas ao fundo, como nas figuras do artigo */
-function drawRate(){
-  const g = prep(document.getElementById('cRate')); if (!g) return;
-  const { c, w, h } = g;
-  const m = { l:36, r:8, t:8, b:26 };
-  const tm = RES.times[RES.times.length-1];
-  const mx = Math.max(...ALL.map(R => Math.max(...R.rates)))*1.12;
-  const A = axes(c, w, h, m,
-    [[0,'0'],[0.5,(tm/2).toFixed(0)],[1,tm.toFixed(0)]],
-    [[0,'0'],[0.5,(mx/2).toFixed(1)],[1,mx.toFixed(1)]],
-    'time (min)   ·   kg PE / kg cat / s');
-  ALL.forEach((R,i) => {
-    if (ACTIVE[i].id === S.dist) return;
-    curve(c, R.times.map((t,k) => [A.X(t/tm), A.Y(R.rates[k]/mx)]), css('--muted'), 1.1, .38);
+/* ============================================================
+   5. ESTADO E DESENHO DOS PAINÉIS
+   ============================================================ */
+let S = { reactor:'batch', dist:1, case:2, t:60 };
+let ALL = null, RES = null, ACTIVE = [], PACK = null;
+const key = id => id === 4 ? 'd4' : 'd6';
+
+/* ---- As séries dos dois reatores são montadas no mesmo formato [x, y], para
+   que os quatro painéis sejam desenhados exatamente pelo mesmo código: todas as
+   distribuições aparecem juntas e a selecionada fica em destaque. ---- */
+function seriesFor(){
+  const cstr = S.reactor === 'cstr';
+  const G = { dist:[], conc:[], rate:[], mwd:[] };
+  ACTIVE.forEach((d, i) => {
+    const sel = d.id === S.dist;
+    if (cstr){
+      const k = key(d.id);
+      G.dist.push({ sel, data: FIG.dist[k] });
+      G.conc.push({ sel, data: FIG.conc[k] });
+      G.rate.push({ sel, data: FIG.rate[k] });
+      G.mwd .push({ sel, data: FIG.mwd[k] });
+    } else {
+      const R = ALL[i];
+      G.dist.push({ sel, data: R.cl.r.map((r,j) => [r, R.cl.n[j]*100]) });
+      G.conc.push({ sel, data: R.times.map((t,j) => [t, R.concs[j]]) });
+      G.rate.push({ sel, data: R.times.map((t,j) => [t, R.rates[j]]) });
+      G.mwd .push({ sel, data: R.mwd.x.map((x,j) => [x + R.shift, R.mwd.y[j]]) });
+    }
   });
-  curve(c, RES.times.map((t,k) => [A.X(t/tm), A.Y(RES.rates[k]/mx)]), css('--accent2'));
-  /* No CSTR a curva é o perfil de uma partícula em função do seu tempo de residência;
-     o que sai do reator é a média ponderada pela DTR, marcada pela linha tracejada. */
-  if (S.reactor === 'cstr' && RES.avgRate != null){
-    const y = A.Y(RES.avgRate/mx);
-    c.beginPath(); c.moveTo(A.X(0), y); c.lineTo(A.X(1), y);
-    c.strokeStyle = css('--accent'); c.lineWidth = 1.2; c.setLineDash([4,4]);
-    c.stroke(); c.setLineDash([]);
-    c.fillStyle = css('--accent'); c.font = '9px "JetBrains Mono", monospace';
-    c.textAlign = 'right'; c.textBaseline = 'bottom';
-    c.fillText('reactor average', A.X(1) - 2, y - 3);
+  /* a MMD é sempre normalizada pelo máximo, como nas figuras do artigo */
+  const mx = Math.max(...G.mwd.map(s => Math.max(...s.data.map(p => p[1])))) || 1;
+  G.mwd.forEach(s => { s.data = s.data.map(([x,y]) => [x, y/mx]); });
+  return G;
+}
+
+/* ---- um único painel de curvas, usado pelos dois reatores ---- */
+function plot(cvId, series, o){
+  const g = prep(document.getElementById(cvId)); if (!g) return;
+  const { c, w, h } = g;
+  const m = { l:38, r:10, t:10, b:26 };
+  /* A escala do painel das distribuições segue a curva selecionada: um pico
+     estreito, como o da distribuição de valor único, esmagaria todas as outras
+     se o eixo fosse comum. Nos painéis de tempo o eixo é comum, de propósito,
+     para que as curvas possam ser comparadas. */
+  const src = o.scaleSel ? series.filter(s => s.sel) : series;
+  const ymax = o.ymax ||
+    Math.max(...src.map(s => Math.max(...s.data.map(p => p[1]))))*1.12;
+  const cl = v => Math.max(0, Math.min(1, v));
+  const A = axes(c, w, h, m, o.xt, o.yt(ymax), o.xlab);
+  const pt = ([x,y]) => [A.X(cl((x-o.xr[0])/(o.xr[1]-o.xr[0]))), A.Y(cl(y/ymax))];
+  const sel0 = series.find(s => s.sel);
+  /* O painel das distribuições é desenhado em barras, sobre a mesma malha de
+     raios usada pelo modelo: a curva do reator contínuo é apenas reamostrada. */
+  if (o.bars){
+    if (!sel0) return;
+    const N = 91, bw = (A.X(1)-A.X(0))/N;
+    const drawBars = (s, solid) => {
+      c.globalAlpha = solid ? 1 : 0.4;
+      for (let i = 0; i < N; i++){
+        const r = o.xr[0] + (o.xr[1]-o.xr[0])*i/(N-1);
+        const v = readAt(s.data, r);
+        if (v <= 0) continue;
+        const y = A.Y(cl(v/ymax));
+        /* na semibatelada só a distribuição escolhida é desenhada, com a mesma
+           escala de cor de antes; no reator contínuo as duas aparecem juntas,
+           a escolhida em laranja e a outra esmaecida, como nas curvas */
+        c.fillStyle = o.barsAll
+          ? (solid ? css('--accent2') : css('--muted'))
+          : ramp(0.25 + 0.75*cl(v/ymax));
+        c.fillRect(A.X(i/(N-1)) - bw/2, y, Math.max(bw*0.9, 1.4), A.Y(0)-y);
+      }
+      c.globalAlpha = 1;
+    };
+    if (o.barsAll) series.forEach(s => { if (!s.sel) drawBars(s, false); });
+    drawBars(sel0, true);
+    return;
+  }
+  series.forEach(s => { if (!s.sel) curve(c, s.data.map(pt), css('--muted'), 1.2, .42); });
+  const sel = sel0; if (!sel) return;
+  const pts = sel.data.map(pt);
+  if (o.fill){
+    c.beginPath();
+    pts.forEach(([px,py],i) => i ? c.lineTo(px,py) : c.moveTo(px,py));
+    c.lineTo(pts[pts.length-1][0], A.Y(0)); c.lineTo(pts[0][0], A.Y(0)); c.closePath();
+    c.fillStyle = css('--glow'); c.fill();
+  }
+  curve(c, pts, css(o.col || '--accent2'));
+  if (o.marker != null){                       // percorre a curva no tempo escolhido
+    const [px,py] = pt([o.marker, readAt(sel.data, o.marker)]);
+    c.strokeStyle = css('--accent'); c.lineWidth = 1; c.setLineDash([3,3]);
+    c.beginPath(); c.moveTo(px, A.Y(0)); c.lineTo(px, py); c.stroke(); c.setLineDash([]);
+    c.beginPath(); c.arc(px, py, 3.4, 0, 6.2832);
+    c.fillStyle = css('--accent'); c.fill();
   }
 }
 
-function drawMwd(){
-  const g = prep(document.getElementById('cMwd')); if (!g) return;
-  const { c, w, h } = g;
-  const m = { l:30, r:8, t:8, b:26 };
-  const A = axes(c, w, h, m,
-    [[0,'1'],[0.5,'5'],[1,'9']],
-    [[0,'0'],[0.5,''],[1,'1']], 'log₁₀ M   ·   w(log M)');
-  const mx = Math.max(...ALL.map(R => Math.max(...R.mwd.y))) || 1;
-  const f = v => Math.max(0, Math.min(1, (v-1)/8));
-  const pts = R => R.mwd.x.map((xv,i) => [A.X(f(xv)), A.Y(R.mwd.y[i]/mx)]);
-  ALL.forEach((R,i) => {
-    if (ACTIVE[i].id === S.dist) return;
-    curve(c, pts(R), css('--muted'), 1.1, .38);
-  });
-  const sel = pts(RES);
-  c.beginPath();
-  sel.forEach(([px,py],i) => i ? c.lineTo(px,py) : c.moveTo(px,py));
-  c.lineTo(sel[sel.length-1][0], A.Y(0)); c.lineTo(sel[0][0], A.Y(0)); c.closePath();
-  c.fillStyle = css('--glow'); c.fill();
-  curve(c, sel, css('--accent3'));
+function drawPanels(){
+  const G = seriesFor();
+  const time = (S.reactor === 'cstr' ? 'residence' : 'reaction') + ' time (min)';
+  const t60 = [[0,'0'],[0.5,'30'],[1,'60']];
+  const unit = mx => [[0,'0'],[0.5,(mx/2).toFixed(1)],[1,mx.toFixed(1)]];
+  plot('c1', G.dist, { xr:[1,10], bars:true, scaleSel:true,
+    barsAll: S.reactor === 'cstr',
+    xt:[[0,'1'],[0.5,'5.5'],[1,'10']],
+    yt: mx => [[0,'0'],[0.5,''],[1,mx.toFixed(1)+'%']],
+    xlab:'mesoparticle radius (µm)' });
+  plot('c2', G.conc, { xr:[0,60], ymax:1, marker:S.t,
+    xt:t60, yt:() => [[0,'0'],[0.5,'0.5'],[1,'1']],
+    xlab:time + '   ·   C / Ceq' });
+  plot('c3', G.rate, { xr:[0,60], marker:S.t,
+    xt:t60, yt:unit,
+    xlab:time + '   ·   kg PE / g cat · h' });
+  plot('c4', G.mwd, { xr:[1,6], ymax:1.12, fill:true, col:'--accent3',
+    xt:[[0,'1'],[0.5,'3.5'],[1,'6']],
+    yt:() => [[0,'0'],[0.5/1.12,'0.5'],[1/1.12,'1']],
+    xlab:'log₁₀ M   ·   w(log M), normalised' });
 }
 
-/* ---- desenho da macropartícula ---- */
+/* ---- desenho ilustrativo da macropartícula (topo da página) ---- */
 function buildPack(distId){
-  const d = DISTS.find(x => x.id === distId);
-  const cl = buildClasses(d, S.reactor === 'cstr' ? P.VpolCSTR : P.Vpol0);
+  const cl = buildClasses(DISTS.find(x => x.id === distId));
   const cum = []; let acc = 0;
   cl.n.forEach(v => { acc += v; cum.push(acc); });
-  const sample = () => { const u = Math.random()*acc; let i = 0; while (cum[i] < u && i < cum.length-1) i++; return cl.r[i]; };
-  const out = [], R = 1;                       // disco de raio 1
-  const scale = 0.052/Math.max(cl.rMean, 1);   // para caber ~200 círculos
+  const sample = () => { const u = Math.random()*acc; let i = 0;
+                         while (cum[i] < u && i < cum.length-1) i++; return cl.r[i]; };
+  const out = [], R = 1, scale = 0.052/Math.max(cl.rMean, 1);
   for (let a = 0; a < 5200 && out.length < 230; a++){
     const rMicron = sample(), rr = rMicron*scale;
     const ang = Math.random()*6.2832, rad = Math.sqrt(Math.random())*(R-rr);
@@ -985,10 +1193,10 @@ function drawParticle(){
   if (!PACK) PACK = buildPack(S.dist);
   for (const p of PACK){
     const x = cxp + p.x*R, y = cyp + p.y*R, r = Math.max(p.r*R, 1);
-    const g = c.createRadialGradient(x - r*0.3, y - r*0.3, r*0.1, x, y, r);
-    g.addColorStop(0, ramp(0.35 + 0.65*p.u));     // pequena = clara, grande = saturada
-    g.addColorStop(1, ramp(0.15 + 0.6*p.u));
-    c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.fillStyle = g; c.fill();
+    const gr = c.createRadialGradient(x - r*0.3, y - r*0.3, r*0.1, x, y, r);
+    gr.addColorStop(0, ramp(0.35 + 0.65*p.u));    // pequena = clara, grande = saturada
+    gr.addColorStop(1, ramp(0.15 + 0.6*p.u));
+    c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.fillStyle = gr; c.fill();
   }
 }
 
@@ -1006,51 +1214,104 @@ function pills(host, items, get, set){
     host.appendChild(b);
   });
 }
-function renderPills(){
-  pills(document.getElementById('distPills'), ACTIVE, () => S.dist, v => { S.dist = v; PACK = null; });
-  pills(document.getElementById('casePills'), CASES, () => S.case, v => { S.case = v; PACK = null; });
-  pills(document.getElementById('reactorPills'),
-    [{ id:'batch', name:'Semibatch' }, { id:'cstr', name:'CSTR · reactor 1' }],
-    () => S.reactor, v => {
-      S.reactor = v; PACK = null;
-      S.t = v === 'cstr' ? 30 : 60;                 // 30 min por reator, como no artigo
-      if (v === 'cstr' && S.dist !== 4 && S.dist !== 6) S.dist = 4;
-      if (v === 'batch') S.case = S.case;
-    });
-}
 const tSlider = document.getElementById('tSlider');
 tSlider.addEventListener('input', () => { S.t = +tSlider.value; refresh(); });
 
+const NOTE_BATCH =
+  'Semibatch reactor, ethylene at 7 bar and 80 °C, macroparticle of '+
+  'V<sub>pol</sub> = 2.7 × 10⁶ µm³, followed up to 60 min. Simplified implementation of the '+
+  'multiparticle model — analytical solution of the isothermal reaction–diffusion equation '+
+  'inside each mesoparticle and method of moments for the chain lengths, with the '+
+  'parameters of Tables 2, 4 and 5. The concentration shown is the volume average inside '+
+  'the mesoparticles, C/C<sub>eq</sub>, and the rate is per gram of catalyst, so both can '+
+  'be compared directly with the continuous reactor; the slider moves along those two '+
+  'curves. The molecular weight distribution is accumulated over the whole hour and is '+
+  'therefore always the 60 min one, placed on the number average published in Table 6. '+
+  'The faint curves are the other three distributions, drawn for comparison.';
+const NOTE_CSTR =
+  'Continuous reactor (CSTR) with its residence time distribution, kinetic case 2. The '+
+  'article compares the two extreme morphologies here: an <em>exponential</em> '+
+  'distribution, made of many small mesoparticles, and a <em>beta</em> distribution, made '+
+  'of a few large ones. Smaller mesoparticles mean a shorter diffusion path, so the '+
+  'monomer concentration inside the particle stays closer to saturation and the '+
+  'polymerisation rate is higher throughout, which in turn gives longer chains. The slider '+
+  'moves along the concentration and rate curves; the molecular weight distribution is '+
+  'accumulated over the whole hour, so it is always the 60 min one. These four curves are '+
+  'taken directly from the published article — nothing is recomputed. Note that a '+
+  'continuous reactor differs from the semibatch in two ways, not one: the particle enters '+
+  'much smaller, which sharpens the diffusion limitation, and the residence time '+
+  'distribution means what leaves the reactor is a mixture of particles of every age.';
+
 function refresh(){
-  /* o ensaio em semibatelada é fixo em 60 min, como no artigo; só o tempo de
-     residência do CSTR é ajustável */
   const cstr = S.reactor === 'cstr';
-  ACTIVE = cstr ? cstrDists() : DISTS;
+  ACTIVE = cstr ? DISTS.filter(d => d.id === 4 || d.id === 6) : DISTS;
   if (!ACTIVE.some(d => d.id === S.dist)) S.dist = ACTIVE[0].id;
-  ALL = ACTIVE.map(d => simulate(d.id, S.case, S.reactor, S.t));
-  RES = ALL[ACTIVE.findIndex(d => d.id === S.dist)];
-  renderPills();
-  tSlider.min = cstr ? 10 : 5;
-  tSlider.value = S.t;
-  document.querySelector('.model').classList.toggle('cstr', cstr);
-  document.querySelector('.model').classList.toggle('batch', !cstr);
+
+  pills(document.getElementById('reactorPills'),
+    [{ id:'batch', name:'Semibatch' }, { id:'cstr', name:'CSTR' }],
+    () => S.reactor, v => {
+      S.reactor = v; PACK = null;
+      S.t = v === 'cstr' ? 30 : 60;
+    });
+  pills(document.getElementById('distPills'), ACTIVE,
+    () => S.dist, v => { S.dist = v; PACK = null; });
+  pills(document.getElementById('casePills'), CASES, () => S.case, v => { S.case = v; });
+
+  /* o artigo publica as curvas do reator contínuo só para o caso cinético 2 */
+  document.getElementById('caseGroup').style.display = cstr ? 'none' : 'grid';
   document.getElementById('timeLabel').textContent =
-    cstr ? 'Mean residence time τ' : 'Reaction time';
+    cstr ? 'Read the curves at' : 'Reaction time';
+  tSlider.min = 2; tSlider.step = 1;      // o mesmo controle nos dois reatores
+  tSlider.value = S.t;
   document.getElementById('tOut').textContent = S.t + ' min';
-  document.getElementById('mwdTitle').textContent = cstr
-    ? 'Molecular weight distribution · reactor 1 outlet'
-    : 'Molecular weight distribution · ' + S.t + ' min';
-  document.getElementById('sNp').textContent  = Math.round(RES.cl.np).toLocaleString('en-US');
-  document.getElementById('sMn').textContent  = RES.Mn.toPrecision(3);
-  document.getElementById('sMw').textContent  = RES.Mw.toPrecision(3);
-  document.getElementById('sPDI').textContent = RES.PDI.toFixed(2);
-  document.getElementById('pcapDist').textContent =
-    DISTS.find(d => d.id === S.dist).name;
-  redrawAll();
+
+  const sel = DISTS.find(d => d.id === S.dist);
+  const L = document.getElementById('legend');
+  const st = (i, k, v) => { document.getElementById('k'+i).innerHTML = k;
+                            document.getElementById('v'+i).textContent = v; };
+
+  if (cstr){
+    const k = key(S.dist);
+    L.innerHTML = ACTIVE.map(d => '<span style="color:'+
+        (d.id===S.dist?css('--accent2'):css('--muted'))+'"><i></i><b>'+d.name+
+        '</b> · '+d.sub+'</span>').join('') +
+      '<span>curves from the article · molecular weight distribution '+
+      'accumulated over the full hour</span>';
+    document.getElementById('t1').textContent = 'Initial mesoparticle distribution';
+    document.getElementById('t2').textContent = 'Monomer concentration';
+    document.getElementById('t3').textContent = 'Polymerisation rate';
+    document.getElementById('t4').textContent = 'Molecular weight distribution · 60 min';
+    const peak = FIG.mwd[k].reduce((a,b) => b[1] > a[1] ? b : a);
+    st(1, 'k<sub>p</sub> (m³/mol·s)', '5.0e3');
+    st(2, 'C/C<sub>eq</sub> at '+S.t+' min', readAt(FIG.conc[k], S.t).toFixed(2));
+    st(3, 'rate (kg PE/g cat·h)', readAt(FIG.rate[k], S.t).toFixed(1));
+    st(4, 'peak log M', peak[0].toFixed(2));
+  } else {
+    ALL = ACTIVE.map(d => sim(d.id, S.case));
+    RES = ALL[ACTIVE.findIndex(d => d.id === S.dist)];
+    L.innerHTML = '<span style="color:'+css('--accent2')+'"><i></i><b>'+sel.name+
+      '</b> · '+sel.sub+'</span><span><i></i>the other three distributions</span>'+
+      '<span>molecular weight distribution accumulated over the full hour</span>';
+    document.getElementById('t1').textContent = 'Mesoparticle size distribution';
+    document.getElementById('t2').textContent = 'Monomer concentration';
+    document.getElementById('t3').textContent = 'Polymerisation rate';
+    document.getElementById('t4').textContent =
+      'Molecular weight distribution · 60 min';
+    st(1, 'k<sub>p</sub> (m³/mol·s)',
+       CASES.find(c => c.id === S.case).kp.toExponential(1).replace('+',''));
+    st(2, 'C/C<sub>eq</sub> at '+S.t+' min', RES.concs[S.t].toFixed(2));
+    st(3, 'rate (kg PE/g cat·h)', RES.rates[S.t].toFixed(1));
+    st(4, 'mesoparticles', Math.round(RES.cl.np).toLocaleString('en-US'));
+  }
+  drawPanels();
+  document.getElementById('note').innerHTML = cstr ? NOTE_CSTR : NOTE_BATCH;
+  document.getElementById('pcapDist').textContent = sel.name;
+  drawParticle();
 }
 function redrawAll(){
-  if (!RES) return;
-  drawDist(); drawRate(); drawMwd(); drawParticle();
+  if (!document.getElementById('c1')) return;
+  if (S.reactor === 'cstr' || RES) drawPanels();
+  drawParticle();
 }
 window.addEventListener('resize', redrawAll);
 
@@ -1063,7 +1324,7 @@ if (window.ResizeObserver){
     cancelAnimationFrame(pending);
     pending = requestAnimationFrame(redrawAll);
   });
-  ['particle','cDist','cRate','cMwd'].forEach(id => ro.observe(document.getElementById(id)));
+  ['particle','c1','c2','c3','c4'].forEach(id => ro.observe(document.getElementById(id)));
 }
 
 setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
@@ -1075,13 +1336,42 @@ document.querySelector('.model').addEventListener('pointerdown', () => { touched
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (!reduced) setInterval(() => {
   if (touched) return;
-  const order = S.reactor === 'cstr' ? [4, 6] : [1, 5, 4, 6];
+  const order = S.reactor === 'cstr' ? [4,6] : [1,5,4,6];
   S.dist = order[(order.indexOf(S.dist) + 1) % order.length];
   PACK = null; refresh();
 }, 4200);
 
 /* ============================================================
-   7. APARIÇÃO DAS SEÇÕES AO ROLAR
+   7. CARTÕES DE PROJETO
+   Viram ao passar o mouse (pelo CSS). O clique e o teclado servem ao telefone e
+   à navegação sem mouse, onde não existe :hover.
+   ============================================================ */
+document.querySelectorAll('.flip').forEach(el => {
+  el.addEventListener('click', e => {
+    if (e.target.closest('a')) return;              // não atrapalha os links
+    el.classList.toggle('open');
+  });
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); el.classList.toggle('open'); }
+  });
+});
+
+/* As duas faces ficam sobrepostas, então a altura do cartão é a da face mais
+   alta. Medir no navegador evita cortar texto em qualquer largura de tela. */
+function sizeFlips(){
+  document.querySelectorAll('.flip').forEach(el => {
+    let hi = 0;
+    el.querySelectorAll('.flip-pad').forEach(p => { hi = Math.max(hi, p.scrollHeight); });
+    if (hi) el.style.height = (hi + 54) + 'px';     // 26 px de recuo em cima e embaixo
+  });
+}
+sizeFlips();
+window.addEventListener('resize', () => { clearTimeout(window._fz);
+  window._fz = setTimeout(sizeFlips, 120); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(sizeFlips);
+
+/* ============================================================
+   8. APARIÇÃO DAS SEÇÕES AO ROLAR
    ============================================================ */
 const io = new IntersectionObserver(es => {
   es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
@@ -1089,6 +1379,7 @@ const io = new IntersectionObserver(es => {
 document.querySelectorAll('.reveal').forEach((el,i) => {
   el.style.transitionDelay = (i%4)*70 + 'ms'; io.observe(el);
 });
+
 </script>
 
 </body>
